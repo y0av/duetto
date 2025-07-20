@@ -155,35 +155,35 @@ export class GameScene extends Phaser.Scene {
       return {
         id: 1,
         name: 'Beginner',
-        obstacleSpeed: 120,
+        obstacleSpeed: 100,
         duration: 30000,
         obstacles: [
-          { type: 'single', x: this.gameConfig.centerX, width: 60, height: 100, delay: 500 },
-          { type: 'double', x: this.gameConfig.centerX, width: 80, height: 120, delay: 2000 },
-          { type: 'single', x: this.gameConfig.centerX - 100, width: 80, height: 100, delay: 3500 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 50, height: 100, delay: 5000 },
-          { type: 'single', x: this.gameConfig.centerX + 80, width: 70, height: 120, delay: 6500 },
-          { type: 'double', x: this.gameConfig.centerX - 50, width: 60, height: 100, delay: 8000 },
-          { type: 'single', x: this.gameConfig.centerX, width: 50, height: 150, delay: 9500 }
+          { type: 'single', x: this.gameConfig.centerX, width: 60, height: 100, delay: 1000 },
+          { type: 'double', x: this.gameConfig.centerX, width: 80, height: 120, delay: 4000 },
+          { type: 'single', x: this.gameConfig.centerX - 100, width: 80, height: 100, delay: 7000 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 50, height: 100, delay: 10500 },
+          { type: 'single', x: this.gameConfig.centerX + 80, width: 70, height: 120, delay: 14000 },
+          { type: 'double', x: this.gameConfig.centerX - 50, width: 60, height: 100, delay: 17500 },
+          { type: 'single', x: this.gameConfig.centerX, width: 50, height: 150, delay: 21000 }
         ]
       };
     } else {
       return {
         id: 2,
         name: 'Intermediate',
-        obstacleSpeed: 150,
+        obstacleSpeed: 130,
         duration: 45000,
         obstacles: [
-          { type: 'single', x: this.gameConfig.centerX, width: 50, height: 80, delay: 500 },
-          { type: 'single', x: this.gameConfig.centerX - 80, width: 50, height: 80, delay: 1500 },
-          { type: 'single', x: this.gameConfig.centerX + 80, width: 50, height: 80, delay: 2500 },
-          { type: 'double', x: this.gameConfig.centerX, width: 60, height: 100, delay: 4000 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 40, height: 120, delay: 5500 },
-          { type: 'single', x: this.gameConfig.centerX - 60, width: 80, height: 100, delay: 7000 },
-          { type: 'single', x: this.gameConfig.centerX + 60, width: 80, height: 100, delay: 8000 },
-          { type: 'double', x: this.gameConfig.centerX + 80, width: 70, height: 120, delay: 9500 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 45, height: 100, delay: 11000 },
-          { type: 'single', x: this.gameConfig.centerX, width: 40, height: 150, delay: 12500 }
+          { type: 'single', x: this.gameConfig.centerX, width: 50, height: 80, delay: 1000 },
+          { type: 'single', x: this.gameConfig.centerX - 80, width: 50, height: 80, delay: 3000 },
+          { type: 'single', x: this.gameConfig.centerX + 80, width: 50, height: 80, delay: 5000 },
+          { type: 'double', x: this.gameConfig.centerX, width: 60, height: 100, delay: 7500 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 40, height: 120, delay: 10000 },
+          { type: 'single', x: this.gameConfig.centerX - 60, width: 80, height: 100, delay: 12500 },
+          { type: 'single', x: this.gameConfig.centerX + 60, width: 80, height: 100, delay: 14500 },
+          { type: 'double', x: this.gameConfig.centerX + 80, width: 70, height: 120, delay: 17000 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 45, height: 100, delay: 20000 },
+          { type: 'single', x: this.gameConfig.centerX, width: 40, height: 150, delay: 23000 }
         ]
       };
     }
