@@ -134,9 +134,8 @@ export class GameOverScene extends Phaser.Scene {
     const glitchOverlay = this.add.text(centerX, centerY - Math.max(100 * scale, 70), 'YOU DIED', {
       fontSize: Math.max(64 * scale, 32) + 'px',
       color: '#ff0000',
-      fontFamily: 'Arial, sans-serif',
-      alpha: 0.3
-    }).setOrigin(0.5);
+      fontFamily: 'Arial, sans-serif'
+    }).setOrigin(0.5).setAlpha(0.3);
 
     // Dramatic pulsing animation
     this.tweens.add({

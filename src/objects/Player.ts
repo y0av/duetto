@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { GameConfig } from '../types/GameTypes';
-import { Obstacle } from './Obstacle';
 import { ParticleEffect } from './ParticleEffect';
+import type { Obstacle } from './Obstacle';
 
 export class Player {
   private scene: Phaser.Scene;
