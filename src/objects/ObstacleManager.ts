@@ -58,6 +58,9 @@ export class ObstacleManager {
   private spawnObstacle(obstacleData: ObstacleData): void {
     const speed = this.levelData?.obstacleSpeed || 100;
     
+    // Get responsive scaling factor
+    const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
+    
     if (obstacleData.type === 'single') {
       const obstacle = new Obstacle(
         this.scene,
@@ -70,11 +73,11 @@ export class ObstacleManager {
       this.obstacles.push(obstacle);
     } else if (obstacleData.type === 'double') {
       // Create two obstacles with a gap - scale gap for higher resolution
-      const gapSize = 200; // Increased gap size for higher resolution
+      const gapSize = Math.max(250 * scale, 180); // Increased gap for larger orb radius
       const leftWidth = obstacleData.x - gapSize / 2;
       const rightWidth = this.gameWidth - (obstacleData.x + gapSize / 2);
 
-      if (leftWidth > 40) {
+      if (leftWidth > 40 * scale) {
         const leftObstacle = new Obstacle(
           this.scene,
           leftWidth / 2,
@@ -86,7 +89,7 @@ export class ObstacleManager {
         this.obstacles.push(leftObstacle);
       }
 
-      if (rightWidth > 40) {
+      if (rightWidth > 40 * scale) {
         const rightObstacle = new Obstacle(
           this.scene,
           obstacleData.x + gapSize / 2 + rightWidth / 2,
@@ -99,7 +102,7 @@ export class ObstacleManager {
       }
     } else if (obstacleData.type === 'triple') {
       // Create three obstacles with two gaps - scale for higher resolution
-      const gapSize = 150; // Increased gap size
+      const gapSize = Math.max(180 * scale, 120); // Increased gap size for larger orbs
       const centerX = this.gameWidth / 2;
       const leftX = centerX - gapSize - obstacleData.width / 2;
       const rightX = centerX + gapSize + obstacleData.width / 2;

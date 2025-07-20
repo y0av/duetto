@@ -19,6 +19,7 @@ export class GameScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private leftInputZone!: Phaser.GameObjects.Zone;
   private rightInputZone!: Phaser.GameObjects.Zone;
+  private gameActive: boolean = true;
 
   constructor() {
     super({ key: Scenes.GAME });
@@ -29,15 +30,26 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Set up game configuration
+    // Set up game configuration with responsive scaling
+    const baseWidth = 1920;
+    const baseHeight = 1080;
+    const actualWidth = this.cameras.main.width;
+    const actualHeight = this.cameras.main.height;
+    const scaleX = actualWidth / baseWidth;
+    const scaleY = actualHeight / baseHeight;
+    const scale = Math.min(scaleX, scaleY);
+
     this.gameConfig = {
-      width: this.cameras.main.width,
-      height: this.cameras.main.height,
-      centerX: this.cameras.main.width / 2,
-      centerY: this.cameras.main.height - 150,
-      orbRadius: 120,
+      width: actualWidth,
+      height: actualHeight,
+      centerX: actualWidth / 2,
+      centerY: actualHeight - (150 * scale),
+      orbRadius: Math.max(150 * scale, 80), // Increased minimum radius for mobile
       rotationSpeed: 0.004
     };
+
+    // Initialize game state
+    this.gameActive = true;
 
     // Background - dark space
     this.cameras.main.setBackgroundColor('#0a0a0a');
@@ -122,6 +134,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    // Only update if game is active
+    if (!this.gameActive) return;
+
     // Handle keyboard input
     if (this.cursors.left.isDown) {
       this.player.startRotation('left');
@@ -152,8 +167,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   private gameOver(): void {
+    // Stop game immediately to prevent multiple particle effects
+    this.gameActive = false;
+    
     // Stop all input processing
     this.input.enabled = false;
+    
+    // Clear all obstacles to prevent more collisions
+    this.obstacleManager.clearAllObstacles();
     
     // Add a delay to show the particle effects before transitioning
     this.time.delayedCall(1000, () => {
@@ -162,10 +183,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   private levelComplete(): void {
+    // Stop game to prevent multiple completion effects
+    this.gameActive = false;
+    
     // Mark level as completed
     this.gameStateManager.completeLevel(this.currentLevel);
     
-    // Create celebration effect
+    // Create celebration effect (only once)
     this.particleEffect.createLevelCompleteEffect(
       this.cameras.main.width / 2,
       this.cameras.main.height / 2
@@ -174,7 +198,7 @@ export class GameScene extends Phaser.Scene {
     // Show completion message with better styling
     const completeText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 
       'LEVEL COMPLETE!', {
-      fontSize: '48px',
+      fontSize: Math.min(48 * (this.cameras.main.width / 1920), 48) + 'px',
       color: '#00ff44',
       fontFamily: 'Arial, sans-serif',
       stroke: '#000000',
@@ -197,6 +221,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getLevelData(level: number): LevelData {
+    // Get responsive scaling factor
+    const scale = Math.min(this.cameras.main.width / 1920, this.cameras.main.height / 1080);
+    
     if (level === 1) {
       return {
         id: 1,
@@ -204,13 +231,13 @@ export class GameScene extends Phaser.Scene {
         obstacleSpeed: 120,
         duration: 30000,
         obstacles: [
-          { type: 'single', x: this.gameConfig.centerX, width: 80, height: 120, delay: 2000 },
-          { type: 'double', x: this.gameConfig.centerX, width: 100, height: 140, delay: 6000 },
-          { type: 'single', x: this.gameConfig.centerX - 200, width: 100, height: 120, delay: 10000 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 70, height: 120, delay: 14500 },
-          { type: 'single', x: this.gameConfig.centerX + 150, width: 90, height: 140, delay: 19000 },
-          { type: 'double', x: this.gameConfig.centerX - 100, width: 80, height: 120, delay: 23500 },
-          { type: 'single', x: this.gameConfig.centerX, width: 70, height: 180, delay: 28000 }
+          { type: 'single', x: this.gameConfig.centerX, width: 80 * scale, height: 120 * scale, delay: 2000 },
+          { type: 'double', x: this.gameConfig.centerX, width: 100 * scale, height: 140 * scale, delay: 6000 },
+          { type: 'single', x: this.gameConfig.centerX - (200 * scale), width: 100 * scale, height: 120 * scale, delay: 10000 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 70 * scale, height: 120 * scale, delay: 14500 },
+          { type: 'single', x: this.gameConfig.centerX + (150 * scale), width: 90 * scale, height: 140 * scale, delay: 19000 },
+          { type: 'double', x: this.gameConfig.centerX - (100 * scale), width: 80 * scale, height: 120 * scale, delay: 23500 },
+          { type: 'single', x: this.gameConfig.centerX, width: 70 * scale, height: 180 * scale, delay: 28000 }
         ]
       };
     } else {
@@ -220,16 +247,16 @@ export class GameScene extends Phaser.Scene {
         obstacleSpeed: 150,
         duration: 45000,
         obstacles: [
-          { type: 'single', x: this.gameConfig.centerX, width: 70, height: 100, delay: 1500 },
-          { type: 'single', x: this.gameConfig.centerX - 150, width: 70, height: 100, delay: 4000 },
-          { type: 'single', x: this.gameConfig.centerX + 150, width: 70, height: 100, delay: 6500 },
-          { type: 'double', x: this.gameConfig.centerX, width: 80, height: 120, delay: 9500 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 60, height: 140, delay: 13000 },
-          { type: 'single', x: this.gameConfig.centerX - 120, width: 100, height: 120, delay: 16500 },
-          { type: 'single', x: this.gameConfig.centerX + 120, width: 100, height: 120, delay: 19000 },
-          { type: 'double', x: this.gameConfig.centerX + 150, width: 90, height: 140, delay: 22500 },
-          { type: 'triple', x: this.gameConfig.centerX, width: 65, height: 120, delay: 26500 },
-          { type: 'single', x: this.gameConfig.centerX, width: 60, height: 200, delay: 30500 }
+          { type: 'single', x: this.gameConfig.centerX, width: 70 * scale, height: 100 * scale, delay: 1500 },
+          { type: 'single', x: this.gameConfig.centerX - (150 * scale), width: 70 * scale, height: 100 * scale, delay: 4000 },
+          { type: 'single', x: this.gameConfig.centerX + (150 * scale), width: 70 * scale, height: 100 * scale, delay: 6500 },
+          { type: 'double', x: this.gameConfig.centerX, width: 80 * scale, height: 120 * scale, delay: 9500 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 60 * scale, height: 140 * scale, delay: 13000 },
+          { type: 'single', x: this.gameConfig.centerX - (120 * scale), width: 100 * scale, height: 120 * scale, delay: 16500 },
+          { type: 'single', x: this.gameConfig.centerX + (120 * scale), width: 100 * scale, height: 120 * scale, delay: 19000 },
+          { type: 'double', x: this.gameConfig.centerX + (150 * scale), width: 90 * scale, height: 140 * scale, delay: 22500 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 65 * scale, height: 120 * scale, delay: 26500 },
+          { type: 'single', x: this.gameConfig.centerX, width: 60 * scale, height: 200 * scale, delay: 30500 }
         ]
       };
     }

@@ -21,11 +21,11 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   scene: [MenuScene, GameScene, GameOverScene],
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     min: {
-      width: 800,
-      height: 600
+      width: 320,
+      height: 480
     },
     max: {
       width: 1920,
@@ -37,6 +37,9 @@ const config: Phaser.Types.Core.GameConfig = {
     antialias: true,
     antialiasGL: true,
     roundPixels: true
+  },
+  input: {
+    activePointers: 3 // Support multi-touch
   }
 };
 
