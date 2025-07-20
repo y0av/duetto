@@ -7,10 +7,11 @@ import { GameOverScene } from './scenes/GameOverScene';
 // Game configuration
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 1920,
+  height: 1080,
   parent: 'app',
-  backgroundColor: '#1a1a1a',
+  backgroundColor: '#0a0a0a',
+  antialias: true,
   physics: {
     default: 'arcade',
     arcade: {
@@ -23,13 +24,19 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     min: {
-      width: 400,
-      height: 300
+      width: 800,
+      height: 600
     },
     max: {
-      width: 1200,
-      height: 900
+      width: 1920,
+      height: 1080
     }
+  },
+  render: {
+    pixelArt: false,
+    antialias: true,
+    antialiasGL: true,
+    roundPixels: true
   }
 };
 

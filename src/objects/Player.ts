@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { GameConfig } from '../types/GameTypes';
 import { Obstacle } from './Obstacle';
+import { ParticleEffect } from './ParticleEffect';
 
 export class Player {
   private scene: Phaser.Scene;
@@ -13,6 +14,7 @@ export class Player {
   private blueOrb!: Phaser.GameObjects.Arc;
   private isRotatingLeft: boolean = false;
   private isRotatingRight: boolean = false;
+  private particleEffect: ParticleEffect;
 
   constructor(scene: Phaser.Scene, config: GameConfig) {
     this.scene = scene;
@@ -20,19 +22,31 @@ export class Player {
     this.centerY = config.centerY;
     this.radius = config.orbRadius;
     this.rotationSpeed = config.rotationSpeed;
+    this.particleEffect = new ParticleEffect(scene);
 
     this.createOrbs();
     this.updateOrbPositions();
   }
 
   private createOrbs(): void {
-    // Create red orb
-    this.redOrb = this.scene.add.circle(0, 0, 12, 0xff4444);
-    this.redOrb.setStrokeStyle(2, 0xff6666);
+    // Create red orb with glow effect
+    this.redOrb = this.scene.add.circle(0, 0, 15, 0xff3333);
+    this.redOrb.setStrokeStyle(3, 0xff6666, 0.8);
+    
+    // Create blue orb with glow effect
+    this.blueOrb = this.scene.add.circle(0, 0, 15, 0x3333ff);
+    this.blueOrb.setStrokeStyle(3, 0x6666ff, 0.8);
 
-    // Create blue orb
-    this.blueOrb = this.scene.add.circle(0, 0, 12, 0x4444ff);
-    this.blueOrb.setStrokeStyle(2, 0x6666ff);
+    // Add subtle pulsing animation
+    this.scene.tweens.add({
+      targets: [this.redOrb, this.blueOrb],
+      scaleX: 1.1,
+      scaleY: 1.1,
+      yoyo: true,
+      repeat: -1,
+      duration: 1000,
+      ease: 'Sine.easeInOut'
+    });
   }
 
   public startRotation(direction: 'left' | 'right'): void {
@@ -99,19 +113,8 @@ export class Player {
   }
 
   private createCollisionEffect(x: number, y: number, color: number): void {
-    // Create a simple visual effect for collision
-    const effect = this.scene.add.circle(x, y, 15, color, 0.8);
-    effect.setScale(0);
-    
-    // Animate the effect
-    this.scene.tweens.add({
-      targets: effect,
-      scale: 2,
-      alpha: 0,
-      duration: 300,
-      ease: 'Power2',
-      onComplete: () => effect.destroy()
-    });
+    // Use the new particle effect system
+    this.particleEffect.createCollisionExplosion(x, y, color);
   }
 
   public reset(): void {

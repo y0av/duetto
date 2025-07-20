@@ -69,12 +69,12 @@ export class ObstacleManager {
       );
       this.obstacles.push(obstacle);
     } else if (obstacleData.type === 'double') {
-      // Create two obstacles with a gap
-      const gapSize = 120; // Size of the gap between obstacles
+      // Create two obstacles with a gap - scale gap for higher resolution
+      const gapSize = 200; // Increased gap size for higher resolution
       const leftWidth = obstacleData.x - gapSize / 2;
       const rightWidth = this.gameWidth - (obstacleData.x + gapSize / 2);
 
-      if (leftWidth > 20) {
+      if (leftWidth > 40) {
         const leftObstacle = new Obstacle(
           this.scene,
           leftWidth / 2,
@@ -86,7 +86,7 @@ export class ObstacleManager {
         this.obstacles.push(leftObstacle);
       }
 
-      if (rightWidth > 20) {
+      if (rightWidth > 40) {
         const rightObstacle = new Obstacle(
           this.scene,
           obstacleData.x + gapSize / 2 + rightWidth / 2,
@@ -98,8 +98,8 @@ export class ObstacleManager {
         this.obstacles.push(rightObstacle);
       }
     } else if (obstacleData.type === 'triple') {
-      // Create three obstacles with two gaps
-      const gapSize = 80;
+      // Create three obstacles with two gaps - scale for higher resolution
+      const gapSize = 150; // Increased gap size
       const centerX = this.gameWidth / 2;
       const leftX = centerX - gapSize - obstacleData.width / 2;
       const rightX = centerX + gapSize + obstacleData.width / 2;
