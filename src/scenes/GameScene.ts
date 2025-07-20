@@ -43,7 +43,7 @@ export class GameScene extends Phaser.Scene {
       width: actualWidth,
       height: actualHeight,
       centerX: actualWidth / 2,
-      centerY: actualHeight - (150 * scale),
+      centerY: actualHeight - Math.max(200 * scale, 120), // Better mobile positioning
       orbRadius: Math.max(150 * scale, 80), // Increased minimum radius for mobile
       rotationSpeed: 0.004
     };

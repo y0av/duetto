@@ -48,8 +48,8 @@ export class MenuScene extends Phaser.Scene {
     // Main title with multiple effects
     this.createTitle(centerX, centerY, scale);
 
-    // Subtitle
-    const subtitle = this.add.text(centerX, centerY - (100 * scale), 'A Minimalist Challenge', {
+    // Subtitle with better mobile spacing
+    const subtitle = this.add.text(centerX, centerY - (Math.max(80 * scale, 60)), 'A Minimalist Challenge', {
       fontSize: Math.max(20 * scale, 14) + 'px',
       color: '#888888',
       fontFamily: 'Arial, sans-serif',
@@ -65,7 +65,7 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // Level buttons with modern design
+    // Level buttons with modern design and mobile spacing
     this.createLevelButtons(centerX, centerY, scale);
 
     // Progress section with visual flair
@@ -112,7 +112,7 @@ export class MenuScene extends Phaser.Scene {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: '#000000',
       fontFamily: 'Arial, sans-serif',
-      fontWeight: 'bold'
+      fontStyle: 'bold'
     }).setOrigin(0.5);
 
     this.titleText = this.add.text(centerX, centerY - (150 * scale), 'DUET', {
@@ -154,42 +154,43 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private createLevelButtons(centerX: number, centerY: number, scale: number): void {
-    const buttonWidth = 280 * scale;
-    const buttonHeight = 60 * scale;
+    const buttonWidth = Math.max(280 * scale, 200);
+    const buttonHeight = Math.max(60 * scale, 45);
+    const buttonSpacing = Math.max(90 * scale, 70); // Increased spacing for mobile
 
     // Level 1 Button
     const level1Completed = this.gameStateManager.isLevelCompleted(1);
-    const level1Container = this.add.container(centerX, centerY + (20 * scale));
+    const level1Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)));
     
     // Button background with gradient effect
     const level1Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
     const level1Border = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
-    level1Border.setStrokeStyle(3 * scale, level1Completed ? 0x00ff44 : 0xff4444);
+    level1Border.setStrokeStyle(Math.max(3 * scale, 2), level1Completed ? 0x00ff44 : 0xff4444);
     
     const level1Text = level1Completed ? 'LEVEL 1 ✓' : 'LEVEL 1';
     const level1Color = level1Completed ? '#00ff44' : '#ff4444';
     
     this.level1Button = this.add.text(0, 0, level1Text, {
-      fontSize: Math.max(28 * scale, 16) + 'px',
+      fontSize: Math.max(28 * scale, 18) + 'px',
       color: level1Color,
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
 
     level1Container.add([level1Bg, level1Border, this.level1Button]);
     
-    // Level 2 Button
+    // Level 2 Button with better spacing
     const level2Completed = this.gameStateManager.isLevelCompleted(2);
-    const level2Container = this.add.container(centerX, centerY + (100 * scale));
+    const level2Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)) + buttonSpacing);
     
     const level2Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
     const level2Border = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
-    level2Border.setStrokeStyle(3 * scale, level2Completed ? 0x00ff44 : 0x4444ff);
+    level2Border.setStrokeStyle(Math.max(3 * scale, 2), level2Completed ? 0x00ff44 : 0x4444ff);
     
     const level2Text = level2Completed ? 'LEVEL 2 ✓' : 'LEVEL 2';
     const level2Color = level2Completed ? '#00ff44' : '#4444ff';
     
     this.level2Button = this.add.text(0, 0, level2Text, {
-      fontSize: Math.max(28 * scale, 16) + 'px',
+      fontSize: Math.max(28 * scale, 18) + 'px',
       color: level2Color,
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
@@ -204,26 +205,26 @@ export class MenuScene extends Phaser.Scene {
   private createProgressSection(centerX: number, centerY: number, scale: number): void {
     const progress = this.gameStateManager.getProgress();
     
-    // Progress container
-    const progressY = centerY + (200 * scale);
+    // Progress container with better mobile spacing
+    const progressY = centerY + Math.max(220 * scale, 180);
     
     // Progress bar background
-    this.add.rectangle(centerX, progressY, 200 * scale, 8 * scale, 0x333333);
+    this.add.rectangle(centerX, progressY, Math.max(200 * scale, 150), Math.max(8 * scale, 6), 0x333333);
     
     // Progress bar fill
     const progressFill = this.add.rectangle(
-      centerX - (100 * scale) + ((progress.completed / progress.total) * 100 * scale),
+      centerX - (Math.max(100 * scale, 75)) + ((progress.completed / progress.total) * Math.max(100 * scale, 75)),
       progressY,
-      (progress.completed / progress.total) * 200 * scale,
-      8 * scale,
+      (progress.completed / progress.total) * Math.max(200 * scale, 150),
+      Math.max(8 * scale, 6),
       0x00ff44
     );
     progressFill.setOrigin(0, 0.5);
 
-    // Progress text
-    this.add.text(centerX, progressY + (25 * scale), 
+    // Progress text with better mobile spacing
+    this.add.text(centerX, progressY + Math.max(30 * scale, 25), 
       `${progress.completed}/${progress.total} LEVELS COMPLETED`, {
-      fontSize: Math.max(16 * scale, 10) + 'px',
+      fontSize: Math.max(16 * scale, 12) + 'px',
       color: '#aaaaaa',
       fontFamily: 'Arial, sans-serif'
     }).setOrigin(0.5);
