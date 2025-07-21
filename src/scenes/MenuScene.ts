@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Scenes } from '../types/GameTypes';
 import { GameStateManager } from '../objects/GameStateManager';
 import { StarField } from '../objects/StarField';
+import { GameProperties } from '../config/GameProperties';
 
 export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
@@ -52,7 +53,7 @@ export class MenuScene extends Phaser.Scene {
     const subtitle = this.add.text(centerX, centerY - (Math.max(80 * scale, 60)), 'A Minimalist Challenge', {
       fontSize: Math.max(20 * scale, 14) + 'px',
       color: '#888888',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Exo 2, Arial, sans-serif',
       fontStyle: 'italic'
     }).setOrigin(0.5);
 
@@ -79,7 +80,7 @@ export class MenuScene extends Phaser.Scene {
       'Built with Phaser 3 + TypeScript', {
       fontSize: Math.max(12 * scale, 8) + 'px',
       color: '#444444',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
   }
 
@@ -117,8 +118,8 @@ export class MenuScene extends Phaser.Scene {
 
     this.titleText = this.add.text(centerX, centerY - (150 * scale), 'DUET', {
       fontSize: Math.max(84 * scale, 42) + 'px',
-      color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
+      color: GameProperties.ui.colors.primary,
+      fontFamily: GameProperties.ui.fonts.title,
       stroke: '#444444',
       strokeThickness: 6 * scale
     }).setOrigin(0.5);
@@ -126,8 +127,8 @@ export class MenuScene extends Phaser.Scene {
     // Gradient overlay effect
     const titleOverlay = this.add.text(centerX, centerY - (150 * scale), 'DUET', {
       fontSize: Math.max(84 * scale, 42) + 'px',
-      color: '#00ffff',
-      fontFamily: 'Arial, sans-serif'
+      color: GameProperties.ui.colors.accent,
+      fontFamily: GameProperties.ui.fonts.title
     }).setOrigin(0.5);
     titleOverlay.setAlpha(0.3);
 
@@ -173,7 +174,7 @@ export class MenuScene extends Phaser.Scene {
     this.level1Button = this.add.text(0, 0, level1Text, {
       fontSize: Math.max(28 * scale, 18) + 'px',
       color: level1Color,
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     level1Container.add([level1Bg, level1Border, this.level1Button]);
@@ -192,7 +193,7 @@ export class MenuScene extends Phaser.Scene {
     this.level2Button = this.add.text(0, 0, level2Text, {
       fontSize: Math.max(28 * scale, 18) + 'px',
       color: level2Color,
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     level2Container.add([level2Bg, level2Border, this.level2Button]);
@@ -207,30 +208,24 @@ export class MenuScene extends Phaser.Scene {
     
     // Progress container with better mobile spacing
     const progressY = centerY + Math.max(220 * scale, 180);
+    const progressBarWidth = Math.max(200 * scale, 150);
+    const progressBarHeight = Math.max(8 * scale, 6);
     
     // Progress bar background
-    this.add.rectangle(centerX, progressY, Math.max(200 * scale, 150), Math.max(8 * scale, 6), 0x333333);
+    this.add.rectangle(centerX, progressY, progressBarWidth, progressBarHeight, 0x333333);
     
-    // Progress bar fill
-    const progressFill = this.add.rectangle(
-      centerX - (Math.max(100 * scale, 75)) + ((progress.completed / progress.total) * Math.max(100 * scale, 75)),
-      progressY,
-      (progress.completed / progress.total) * Math.max(200 * scale, 150),
-      Math.max(8 * scale, 6),
-      0x00ff44
-    );
-    progressFill.setOrigin(0, 0.5);
-
-    // Progress text with better mobile spacing
-    this.add.text(centerX, progressY + Math.max(30 * scale, 25), 
-      `${progress.completed}/${progress.total} LEVELS COMPLETED`, {
-      fontSize: Math.max(16 * scale, 12) + 'px',
-      color: '#aaaaaa',
-      fontFamily: 'Arial, sans-serif'
-    }).setOrigin(0.5);
-
-    // Animate progress bar
+    // Progress bar fill - properly aligned
     if (progress.completed > 0) {
+      const fillWidth = (progress.completed / progress.total) * progressBarWidth;
+      const progressFill = this.add.rectangle(
+        centerX - (progressBarWidth / 2) + (fillWidth / 2), // Properly positioned from left edge
+        progressY,
+        fillWidth,
+        progressBarHeight,
+        0x00ff44
+      );
+      
+      // Animate progress bar
       this.tweens.add({
         targets: progressFill,
         alpha: { from: 0.7, to: 1 },
@@ -240,6 +235,14 @@ export class MenuScene extends Phaser.Scene {
         ease: 'Sine.easeInOut'
       });
     }
+
+    // Progress text with better mobile spacing
+    this.add.text(centerX, progressY + Math.max(30 * scale, 25), 
+      `${progress.completed}/${progress.total} LEVELS COMPLETED`, {
+      fontSize: Math.max(16 * scale, 12) + 'px',
+      color: '#aaaaaa',
+      fontFamily: 'Exo 2, Arial, sans-serif'
+    }).setOrigin(0.5);
   }
 
   private createInstructions(centerX: number, scale: number): void {
@@ -252,13 +255,13 @@ export class MenuScene extends Phaser.Scene {
     this.add.text(centerX - (60 * scale), instructionsY - (20 * scale), 'L', {
       fontSize: Math.max(12 * scale, 8) + 'px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     this.add.text(centerX + (60 * scale), instructionsY - (20 * scale), 'R', {
       fontSize: Math.max(12 * scale, 8) + 'px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     // Pulse animation for icons
@@ -276,7 +279,7 @@ export class MenuScene extends Phaser.Scene {
       'Tap screen sides or use arrow keys to rotate', {
       fontSize: Math.max(14 * scale, 10) + 'px',
       color: '#888888',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
   }
 

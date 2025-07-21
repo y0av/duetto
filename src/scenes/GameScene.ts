@@ -4,6 +4,7 @@ import { ObstacleManager } from '../objects/ObstacleManager';
 import { StarField } from '../objects/StarField';
 import { ParticleEffect } from '../objects/ParticleEffect';
 import { GameStateManager } from '../objects/GameStateManager';
+import { GameProperties } from '../config/GameProperties';
 import type { GameConfig, LevelData } from '../types/GameTypes';
 import { Scenes } from '../types/GameTypes';
 
@@ -20,6 +21,7 @@ export class GameScene extends Phaser.Scene {
   private leftInputZone!: Phaser.GameObjects.Zone;
   private rightInputZone!: Phaser.GameObjects.Zone;
   private gameActive: boolean = true;
+  private isTouchActive: boolean = false;
 
   constructor() {
     super({ key: Scenes.GAME });
@@ -85,7 +87,7 @@ export class GameScene extends Phaser.Scene {
     this.add.text(40, 40, `Level ${this.currentLevel}`, {
       fontSize: '24px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Exo 2, Arial, sans-serif',
       stroke: '#000000',
       strokeThickness: 2
     });
@@ -95,40 +97,92 @@ export class GameScene extends Phaser.Scene {
     // Keyboard input
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    // Touch/Mouse input zones
+    // Touch/Mouse input zones with better reliability
     const halfWidth = this.cameras.main.width / 2;
     
+    // Create invisible touch zones that cover the entire screen halves
     this.leftInputZone = this.add.zone(0, 0, halfWidth, this.cameras.main.height);
     this.leftInputZone.setOrigin(0, 0);
-    this.leftInputZone.setInteractive();
+    this.leftInputZone.setInteractive({ useHandCursor: false });
 
     this.rightInputZone = this.add.zone(halfWidth, 0, halfWidth, this.cameras.main.height);
     this.rightInputZone.setOrigin(0, 0);
-    this.rightInputZone.setInteractive();
+    this.rightInputZone.setInteractive({ useHandCursor: false });
 
-    // Left zone events
-    this.leftInputZone.on('pointerdown', () => {
+    // Add visual debug indicators (optional - can be removed for production)
+    if (GameProperties.debug.showDebugInfo) {
+      const leftDebug = this.add.rectangle(halfWidth / 2, this.cameras.main.height / 2, halfWidth, this.cameras.main.height, 0xff0000, GameProperties.debug.touchZoneOpacity);
+      const rightDebug = this.add.rectangle(halfWidth + halfWidth / 2, this.cameras.main.height / 2, halfWidth, this.cameras.main.height, 0x0000ff, GameProperties.debug.touchZoneOpacity);
+      
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Touch zones created - Left:', leftDebug.getBounds(), 'Right:', rightDebug.getBounds());
+      }
+    }
+
+    // Left zone events with better touch handling
+    this.leftInputZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Left zone touched at:', pointer.x, pointer.y);
+      }
+      this.isTouchActive = true;
       this.player.startRotation('left');
     });
 
     this.leftInputZone.on('pointerup', () => {
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Left zone released');
+      }
+      this.isTouchActive = false;
       this.player.stopRotation();
     });
 
     this.leftInputZone.on('pointerout', () => {
+      this.isTouchActive = false;
       this.player.stopRotation();
     });
 
-    // Right zone events
-    this.rightInputZone.on('pointerdown', () => {
+    // Right zone events with better touch handling
+    this.rightInputZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Right zone touched at:', pointer.x, pointer.y);
+      }
+      this.isTouchActive = true;
       this.player.startRotation('right');
     });
 
     this.rightInputZone.on('pointerup', () => {
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Right zone released');
+      }
+      this.isTouchActive = false;
       this.player.stopRotation();
     });
 
     this.rightInputZone.on('pointerout', () => {
+      this.isTouchActive = false;
+      this.player.stopRotation();
+    });
+
+    // Global touch handling as backup
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (!this.gameActive) return;
+      
+      const isLeftSide = pointer.x < this.cameras.main.width / 2;
+      if (GameProperties.debug.enableTouchLogging) {
+        console.log('Global touch:', pointer.x, pointer.y, 'Left side:', isLeftSide);
+      }
+      
+      this.isTouchActive = true;
+      if (isLeftSide) {
+        this.player.startRotation('left');
+      } else {
+        this.player.startRotation('right');
+      }
+    });
+
+    this.input.on('pointerup', () => {
+      if (!this.gameActive) return;
+      this.isTouchActive = false;
       this.player.stopRotation();
     });
   }
@@ -137,13 +191,15 @@ export class GameScene extends Phaser.Scene {
     // Only update if game is active
     if (!this.gameActive) return;
 
-    // Handle keyboard input
-    if (this.cursors.left.isDown) {
-      this.player.startRotation('left');
-    } else if (this.cursors.right.isDown) {
-      this.player.startRotation('right');
-    } else {
-      this.player.stopRotation();
+    // Handle keyboard input only if no touch input is active
+    if (!this.isTouchActive) {
+      if (this.cursors.left.isDown) {
+        this.player.startRotation('left');
+      } else if (this.cursors.right.isDown) {
+        this.player.startRotation('right');
+      } else {
+        this.player.stopRotation();
+      }
     }
 
     // Update starfield
@@ -200,7 +256,7 @@ export class GameScene extends Phaser.Scene {
       'LEVEL COMPLETE!', {
       fontSize: Math.min(48 * (this.cameras.main.width / 1920), 48) + 'px',
       color: '#00ff44',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Orbitron, Arial, sans-serif',
       stroke: '#000000',
       strokeThickness: 3
     }).setOrigin(0.5);

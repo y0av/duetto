@@ -54,7 +54,7 @@ export class GameOverScene extends Phaser.Scene {
     const levelText = this.add.text(0, 0, `LEVEL ${this.currentLevel}`, {
       fontSize: Math.max(20 * scale, 14) + 'px',
       color: '#ffffff',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
     
     levelContainer.add([levelBg, levelText]);
@@ -74,7 +74,7 @@ export class GameOverScene extends Phaser.Scene {
     const failureText = this.add.text(centerX, this.cameras.main.height - Math.max(60 * scale, 40), randomMessage, {
       fontSize: Math.max(16 * scale, 12) + 'px',
       color: '#888888',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Exo 2, Arial, sans-serif',
       fontStyle: 'italic'
     }).setOrigin(0.5);
 
@@ -118,14 +118,14 @@ export class GameOverScene extends Phaser.Scene {
     const titleShadow = this.add.text(centerX + 4, centerY - Math.max(100 * scale, 70) + 4, 'YOU DIED', {
       fontSize: Math.max(64 * scale, 32) + 'px',
       color: '#000000',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Orbitron, Arial, sans-serif'
     }).setOrigin(0.5);
 
     // Main title
     const gameOverText = this.add.text(centerX, centerY - Math.max(100 * scale, 70), 'YOU DIED', {
       fontSize: Math.max(64 * scale, 32) + 'px',
       color: '#ff4444',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Orbitron, Arial, sans-serif',
       stroke: '#660000',
       strokeThickness: Math.max(4 * scale, 2)
     }).setOrigin(0.5);
@@ -134,7 +134,7 @@ export class GameOverScene extends Phaser.Scene {
     const glitchOverlay = this.add.text(centerX, centerY - Math.max(100 * scale, 70), 'YOU DIED', {
       fontSize: Math.max(64 * scale, 32) + 'px',
       color: '#ff0000',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Orbitron, Arial, sans-serif'
     }).setOrigin(0.5).setAlpha(0.3);
 
     // Dramatic pulsing animation
@@ -183,7 +183,7 @@ export class GameOverScene extends Phaser.Scene {
     const retryText = this.add.text(0, 0, 'RETRY', {
       fontSize: Math.max(24 * scale, 16) + 'px',
       color: '#00ff44',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     retryContainer.add([retryBg, retryBorder, retryText]);
@@ -198,7 +198,7 @@ export class GameOverScene extends Phaser.Scene {
     const menuText = this.add.text(0, 0, 'MENU', {
       fontSize: Math.max(24 * scale, 16) + 'px',
       color: '#4444ff',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Exo 2, Arial, sans-serif'
     }).setOrigin(0.5);
 
     menuContainer.add([menuBg, menuBorder, menuText]);
