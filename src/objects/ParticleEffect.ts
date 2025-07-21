@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { GameProperties } from '../config/GameProperties';
 
 export class ParticleEffect {
   private scene: Phaser.Scene;
@@ -20,8 +21,9 @@ export class ParticleEffect {
 
   private createMainExplosion(x: number, y: number, color: number): void {
     // Massive particle burst
-    for (let i = 0; i < 80; i++) { // Increased from 30 to 80
-      const angle = (i / 80) * Math.PI * 2;
+    const burstCount = GameProperties.visual.particles.collision.mainBurst;
+    for (let i = 0; i < burstCount; i++) {
+      const angle = (i / burstCount) * Math.PI * 2;
       const distance = Phaser.Math.Between(50, 300); // Increased range
       const particle = this.scene.add.circle(x, y, Phaser.Math.Between(3, 12), color); // Bigger particles
       
@@ -45,9 +47,10 @@ export class ParticleEffect {
     // Create particles that blast across the entire screen
     const screenWidth = this.scene.cameras.main.width;
     const screenHeight = this.scene.cameras.main.height;
+    const blastCount = GameProperties.visual.particles.collision.screenWideBlast;
     
-    for (let i = 0; i < 60; i++) {
-      const angle = (i / 60) * Math.PI * 2;
+    for (let i = 0; i < blastCount; i++) {
+      const angle = (i / blastCount) * Math.PI * 2;
       const particle = this.scene.add.circle(x, y, Phaser.Math.Between(2, 8), color);
       
       // Calculate target position at screen edge
@@ -69,7 +72,8 @@ export class ParticleEffect {
 
   private createSparkles(x: number, y: number, color: number): void {
     // Massive sparkle particles explosion
-    for (let i = 0; i < 100; i++) { // Increased from 20 to 100
+    const sparkleCount = GameProperties.visual.particles.collision.sparkles;
+    for (let i = 0; i < sparkleCount; i++) {
       const sparkle = this.scene.add.circle(
         x + Phaser.Math.Between(-50, 50),
         y + Phaser.Math.Between(-50, 50),

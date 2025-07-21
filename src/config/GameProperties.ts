@@ -76,7 +76,19 @@ export const GameProperties = {
     redOrbColor: 0xff3333,
     redOrbGlow: 0xff6666,
     blueOrbColor: 0x3333ff,
-    blueOrbGlow: 0x6666ff
+    blueOrbGlow: 0x6666ff,
+    
+    // Trail Effects
+    trail: {
+      enabled: true,
+      length: 20, // More segments for smoother trail
+      fadeSpeed: 0.06, // Slower fade for longer trails
+      minAlpha: 0.05, // Very low minimum for smooth fade-out
+      maxAlpha: 0.8, // Good visibility
+      scaleReduction: 0.92, // Gentler size reduction
+      updateFrequency: 16, // 60fps updates for smoothness
+      smoothing: 0.6 // Higher smoothing for fluid motion
+    }
   },
 
   // UI Styling

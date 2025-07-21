@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import type { GameConfig } from '../types/GameTypes';
 import { ParticleEffect } from './ParticleEffect';
+import { Trail } from './Trail';
+import { GameProperties } from '../config/GameProperties';
 import type { Obstacle } from './Obstacle';
 
 export class Player {
@@ -12,6 +14,8 @@ export class Player {
   private rotationSpeed: number;
   private redOrb!: Phaser.GameObjects.Arc;
   private blueOrb!: Phaser.GameObjects.Arc;
+  private redTrail!: Trail;
+  private blueTrail!: Trail;
   private isRotatingLeft: boolean = false;
   private isRotatingRight: boolean = false;
   private particleEffect: ParticleEffect;
@@ -25,28 +29,37 @@ export class Player {
     this.particleEffect = new ParticleEffect(scene);
 
     this.createOrbs();
+    this.createTrails();
     this.updateOrbPositions();
   }
 
   private createOrbs(): void {
     // Create red orb with glow effect
-    this.redOrb = this.scene.add.circle(0, 0, 15, 0xff3333);
-    this.redOrb.setStrokeStyle(3, 0xff6666, 0.8);
+    this.redOrb = this.scene.add.circle(0, 0, GameProperties.player.orbSize, GameProperties.player.redOrbColor);
+    this.redOrb.setStrokeStyle(3, GameProperties.player.redOrbGlow, GameProperties.player.glowIntensity);
+    this.redOrb.setDepth(10); // Set orbs at depth 10
     
     // Create blue orb with glow effect
-    this.blueOrb = this.scene.add.circle(0, 0, 15, 0x3333ff);
-    this.blueOrb.setStrokeStyle(3, 0x6666ff, 0.8);
+    this.blueOrb = this.scene.add.circle(0, 0, GameProperties.player.orbSize, GameProperties.player.blueOrbColor);
+    this.blueOrb.setStrokeStyle(3, GameProperties.player.blueOrbGlow, GameProperties.player.glowIntensity);
+    this.blueOrb.setDepth(10); // Set orbs at depth 10
 
     // Add subtle pulsing animation
     this.scene.tweens.add({
       targets: [this.redOrb, this.blueOrb],
-      scaleX: 1.1,
-      scaleY: 1.1,
+      scaleX: GameProperties.player.pulseScale,
+      scaleY: GameProperties.player.pulseScale,
       yoyo: true,
       repeat: -1,
-      duration: 1000,
+      duration: GameProperties.player.pulseSpeed,
       ease: 'Sine.easeInOut'
     });
+  }
+
+  private createTrails(): void {
+    // Create trail effects for both orbs
+    this.redTrail = new Trail(this.scene, GameProperties.player.redOrbColor);
+    this.blueTrail = new Trail(this.scene, GameProperties.player.blueOrbColor);
   }
 
   public startRotation(direction: 'left' | 'right'): void {
@@ -76,6 +89,11 @@ export class Player {
     this.angle = this.angle % (Math.PI * 2);
 
     this.updateOrbPositions();
+    
+    // Update trails with current orb positions
+    const currentTime = this.scene.time.now;
+    this.redTrail.update(this.redOrb.x, this.redOrb.y, currentTime);
+    this.blueTrail.update(this.blueOrb.x, this.blueOrb.y, currentTime);
   }
 
   private updateOrbPositions(): void {
@@ -122,6 +140,37 @@ export class Player {
     this.isRotatingLeft = false;
     this.isRotatingRight = false;
     this.updateOrbPositions();
+    
+    // Reset trails
+    this.redTrail.reset();
+    this.blueTrail.reset();
+  }
+
+  public destroy(): void {
+    // Clean up trails
+    if (this.redTrail) {
+      this.redTrail.destroy();
+    }
+    if (this.blueTrail) {
+      this.blueTrail.destroy();
+    }
+    
+    // Destroy orbs
+    if (this.redOrb) {
+      this.redOrb.destroy();
+    }
+    if (this.blueOrb) {
+      this.blueOrb.destroy();
+    }
+  }
+
+  public setTrailEnabled(enabled: boolean): void {
+    if (this.redTrail) {
+      this.redTrail.setEnabled(enabled);
+    }
+    if (this.blueTrail) {
+      this.blueTrail.setEnabled(enabled);
+    }
   }
 
   public getRedOrb(): Phaser.GameObjects.Arc {
@@ -130,10 +179,5 @@ export class Player {
 
   public getBlueOrb(): Phaser.GameObjects.Arc {
     return this.blueOrb;
-  }
-
-  public destroy(): void {
-    this.redOrb.destroy();
-    this.blueOrb.destroy();
   }
 }
