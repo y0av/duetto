@@ -142,4 +142,9 @@ export class GameStateManager {
       this.saveGameState();
     }
   }
+
+  public clearAllColorSplashes(): void {
+    this.gameState.colorSplashes = {};
+    this.saveGameState();
+  }
 }

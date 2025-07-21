@@ -7,6 +7,7 @@ interface ColorSplash {
   color: number;
   size: number;
   alpha: number;
+  visualObjects: { obj: Phaser.GameObjects.Arc; relativeX: number; relativeY: number }[]; // Store relative positions
 }
 
 export class Obstacle {
@@ -44,15 +45,16 @@ export class Obstacle {
   }
 
   private updateSplashPositions(): void {
-    for (let i = 0; i < this.splashObjects.length; i++) {
-      const splash = this.splashObjects[i];
-      const splashData = this.colorSplashes[i];
-      
-      if (splash && splashData) {
-        // Calculate world position from relative position
-        const worldX = this.x - (this.width / 2) + (splashData.x * this.width);
-        const worldY = this.y - (this.height / 2) + (splashData.y * this.height);
-        splash.setPosition(worldX, worldY);
+    // Update positions for all splash visual objects using stored relative positions
+    for (const splash of this.colorSplashes) {
+      for (const visualData of splash.visualObjects) {
+        if (visualData.obj && visualData.obj.active) {
+          // Calculate world position from stored relative position
+          const newWorldX = this.x - (this.width / 2) + (visualData.relativeX * this.width);
+          const newWorldY = this.y - (this.height / 2) + (visualData.relativeY * this.height);
+          
+          visualData.obj.setPosition(newWorldX, newWorldY);
+        }
       }
     }
   }
@@ -62,38 +64,79 @@ export class Obstacle {
     const relativeX = (hitX - (this.x - this.width / 2)) / this.width;
     const relativeY = (hitY - (this.y - this.height / 2)) / this.height;
     
-    // Clamp to obstacle bounds
-    const clampedX = Math.max(0, Math.min(1, relativeX));
-    const clampedY = Math.max(0, Math.min(1, relativeY));
+    // Clamp to obstacle bounds with some margin to ensure splashes stay inside
+    const margin = 0.1; // 10% margin from edges
+    const clampedX = Math.max(margin, Math.min(1 - margin, relativeX));
+    const clampedY = Math.max(margin, Math.min(1 - margin, relativeY));
     
-    // Create splash data
+    // Create irregular splash objects
+    const visualObjects = this.createIrregularSplash(clampedX, clampedY, color, 4 + Math.random() * 3, 0.7 + Math.random() * 0.2);
+    
+    // Create splash data with visual objects
     const splash: ColorSplash = {
       x: clampedX,
       y: clampedY,
       color: color,
-      size: 8 + Math.random() * 4, // Random size between 8-12
-      alpha: 0.8 + Math.random() * 0.2 // Random alpha between 0.8-1.0
+      size: 4 + Math.random() * 3, // Smaller size: 4-7 pixels
+      alpha: 0.7 + Math.random() * 0.2, // Random alpha between 0.7-0.9
+      visualObjects: visualObjects
     };
     
     this.colorSplashes.push(splash);
     
-    // Create visual splash object
-    const worldX = this.x - (this.width / 2) + (clampedX * this.width);
-    const worldY = this.y - (this.height / 2) + (clampedY * this.height);
-    
-    const splashObj = this.scene.add.circle(worldX, worldY, splash.size, color);
-    splashObj.setAlpha(splash.alpha);
-    splashObj.setDepth(8); // Above obstacles but below orbs
-    
-    // Add a subtle stroke for better visibility
-    splashObj.setStrokeStyle(1, color, 0.6);
-    
-    this.splashObjects.push(splashObj);
+    // Add all visual objects to main array for cleanup
+    this.splashObjects.push(...visualObjects.map(v => v.obj));
     
     // Save to persistent storage
     this.saveSplashesToStorage();
     
     console.log(`Color splash added to obstacle ${this.obstacleId} at relative pos (${clampedX.toFixed(2)}, ${clampedY.toFixed(2)}) with color ${color.toString(16)}`);
+  }
+
+  private createIrregularSplash(relativeX: number, relativeY: number, color: number, baseSize: number, baseAlpha: number): { obj: Phaser.GameObjects.Arc; relativeX: number; relativeY: number }[] {
+    const visualObjects: { obj: Phaser.GameObjects.Arc; relativeX: number; relativeY: number }[] = [];
+    
+    // Calculate world position
+    const worldX = this.x - (this.width / 2) + (relativeX * this.width);
+    const worldY = this.y - (this.height / 2) + (relativeY * this.height);
+    
+    // Create main splash droplet
+    const mainSplash = this.scene.add.circle(worldX, worldY, baseSize, color);
+    mainSplash.setAlpha(baseAlpha);
+    mainSplash.setDepth(7); // Just above obstacles but below orbs
+    visualObjects.push({
+      obj: mainSplash,
+      relativeX: relativeX,
+      relativeY: relativeY
+    });
+    
+    // Add 2-4 smaller satellite droplets around the main splash
+    const satelliteCount = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < satelliteCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = baseSize * 0.8 + Math.random() * baseSize * 0.4; // Distance from main splash
+      const satelliteSize = baseSize * 0.3 + Math.random() * baseSize * 0.3; // 30-60% of main size
+      
+      const satelliteX = worldX + Math.cos(angle) * distance;
+      const satelliteY = worldY + Math.sin(angle) * distance;
+      
+      // Calculate relative position for satellite
+      const satRelativeX = (satelliteX - (this.x - this.width / 2)) / this.width;
+      const satRelativeY = (satelliteY - (this.y - this.height / 2)) / this.height;
+      
+      if (satRelativeX >= 0.05 && satRelativeX <= 0.95 && satRelativeY >= 0.05 && satRelativeY <= 0.95) {
+        const satellite = this.scene.add.circle(satelliteX, satelliteY, satelliteSize, color);
+        satellite.setAlpha(baseAlpha * 0.6); // Slightly more transparent than main splash
+        satellite.setDepth(7);
+        visualObjects.push({
+          obj: satellite,
+          relativeX: satRelativeX,
+          relativeY: satRelativeY
+        });
+      }
+    }
+    
+    return visualObjects;
   }
 
   public getId(): string {
@@ -121,13 +164,30 @@ export class Obstacle {
     const obstacleSplashes = levelSplashes.find(obs => obs.obstacleId === this.obstacleId);
     
     if (obstacleSplashes) {
-      this.restoreSplashes(obstacleSplashes.splashes.map(splash => ({
-        x: splash.x,
-        y: splash.y,
-        color: splash.color,
-        size: splash.size,
-        alpha: splash.alpha
-      })));
+      // Restore splashes from storage data
+      obstacleSplashes.splashes.forEach(splashData => {
+        // Create visual objects for this splash
+        const visualObjects = this.createIrregularSplash(
+          splashData.x, 
+          splashData.y, 
+          splashData.color, 
+          splashData.size, 
+          splashData.alpha
+        );
+        
+        // Create splash object with visual components
+        const restoredSplash: ColorSplash = {
+          x: splashData.x,
+          y: splashData.y,
+          color: splashData.color,
+          size: splashData.size,
+          alpha: splashData.alpha,
+          visualObjects: visualObjects
+        };
+        
+        this.colorSplashes.push(restoredSplash);
+        this.splashObjects.push(...visualObjects.map(v => v.obj));
+      });
     }
   }
 
@@ -145,7 +205,13 @@ export class Obstacle {
 
   public destroy(): void {
     // Destroy all splash objects
-    this.splashObjects.forEach(splash => splash.destroy());
+    for (const splash of this.colorSplashes) {
+      for (const visualData of splash.visualObjects) {
+        if (visualData.obj) {
+          visualData.obj.destroy();
+        }
+      }
+    }
     this.splashObjects = [];
     this.colorSplashes = [];
     
@@ -162,30 +228,48 @@ export class Obstacle {
     this.updateSplashPositions();
   }
 
-  public getSplashData(): ColorSplash[] {
-    return [...this.colorSplashes]; // Return copy of splash data
+  public getSplashData(): ColorSplashData[] {
+    // Return splash data without visual objects for serialization
+    return this.colorSplashes.map(splash => ({
+      x: splash.x,
+      y: splash.y,
+      color: splash.color,
+      size: splash.size,
+      alpha: splash.alpha
+    }));
   }
 
   public restoreSplashes(splashes: ColorSplash[]): void {
     // Clear existing splashes
-    this.splashObjects.forEach(splash => splash.destroy());
+    for (const splash of this.colorSplashes) {
+      for (const visualData of splash.visualObjects) {
+        if (visualData.obj) {
+          visualData.obj.destroy();
+        }
+      }
+    }
     this.splashObjects = [];
     this.colorSplashes = [];
     
     // Restore each splash
     splashes.forEach(splashData => {
-      this.colorSplashes.push(splashData);
+      // Create visual objects for this splash
+      const visualObjects = this.createIrregularSplash(
+        splashData.x, 
+        splashData.y, 
+        splashData.color, 
+        splashData.size, 
+        splashData.alpha
+      );
       
-      // Create visual splash object
-      const worldX = this.x - (this.width / 2) + (splashData.x * this.width);
-      const worldY = this.y - (this.height / 2) + (splashData.y * this.height);
+      // Create complete splash object
+      const restoredSplash: ColorSplash = {
+        ...splashData,
+        visualObjects: visualObjects
+      };
       
-      const splashObj = this.scene.add.circle(worldX, worldY, splashData.size, splashData.color);
-      splashObj.setAlpha(splashData.alpha);
-      splashObj.setDepth(8); // Above obstacles but below orbs
-      splashObj.setStrokeStyle(1, splashData.color, 0.6);
-      
-      this.splashObjects.push(splashObj);
+      this.colorSplashes.push(restoredSplash);
+      this.splashObjects.push(...visualObjects.map(v => v.obj));
     });
   }
 

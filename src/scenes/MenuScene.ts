@@ -72,6 +72,9 @@ export class MenuScene extends Phaser.Scene {
     // Progress section with visual flair
     this.createProgressSection(centerX, centerY, scale);
 
+    // Settings Button - positioned below progress section
+    this.createSettingsButton(centerX, centerY + Math.max(300 * scale, 250), scale);
+
     // Instructions with animated icons
     this.createInstructions(centerX, scale);
 
@@ -203,6 +206,29 @@ export class MenuScene extends Phaser.Scene {
     this.setupModernButton(level2Container, level2Border, 2, scale);
   }
 
+  private createSettingsButton(centerX: number, centerY: number, scale: number): void {
+    const buttonWidth = Math.max(200 * scale, 150);
+    const buttonHeight = Math.max(50 * scale, 40);
+
+    const settingsContainer = this.add.container(centerX, centerY);
+    
+    // Button background
+    const settingsBg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
+    const settingsBorder = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
+    settingsBorder.setStrokeStyle(Math.max(2 * scale, 1), 0x888888);
+    
+    const settingsText = this.add.text(0, 0, 'SETTINGS', {
+      fontSize: Math.max(20 * scale, 14) + 'px',
+      color: '#888888',
+      fontFamily: 'Exo 2, Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    settingsContainer.add([settingsBg, settingsBorder, settingsText]);
+
+    // Make button interactive
+    this.setupSettingsButton(settingsContainer, settingsBorder, scale);
+  }
+
   private createProgressSection(centerX: number, centerY: number, scale: number): void {
     const progress = this.gameStateManager.getProgress();
     
@@ -326,6 +352,53 @@ export class MenuScene extends Phaser.Scene {
         yoyo: true,
         onComplete: () => {
           this.startLevel(level);
+        }
+      });
+    });
+  }
+
+  private setupSettingsButton(container: Phaser.GameObjects.Container, border: Phaser.GameObjects.Rectangle, scale: number): void {
+    container.setInteractive(new Phaser.Geom.Rectangle(-100 * scale, -25 * scale, 200 * scale, 50 * scale), Phaser.Geom.Rectangle.Contains);
+
+    container.on('pointerover', () => {
+      this.tweens.add({
+        targets: container,
+        scale: 1.05,
+        duration: 200,
+        ease: 'Power2'
+      });
+      
+      this.tweens.add({
+        targets: border,
+        alpha: 1,
+        duration: 200
+      });
+    });
+
+    container.on('pointerout', () => {
+      this.tweens.add({
+        targets: container,
+        scale: 1,
+        duration: 200,
+        ease: 'Power2'
+      });
+      
+      this.tweens.add({
+        targets: border,
+        alpha: 0.8,
+        duration: 200
+      });
+    });
+
+    container.on('pointerdown', () => {
+      this.tweens.add({
+        targets: container,
+        scale: 0.95,
+        duration: 100,
+        ease: 'Power2',
+        yoyo: true,
+        onComplete: () => {
+          this.scene.start(Scenes.SETTINGS);
         }
       });
     });

@@ -34,5 +34,6 @@ export enum GameEvents {
 export enum Scenes {
   MENU = 'MenuScene',
   GAME = 'GameScene',
-  GAME_OVER = 'GameOverScene'
+  GAME_OVER = 'GameOverScene',
+  SETTINGS = 'SettingsScene'
 }
