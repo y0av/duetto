@@ -13,7 +13,9 @@ export const GameProperties = {
     // Enable console logging for touch events
     enableTouchLogging: true,
     // Show debug info in development mode
-    showDebugInfo: process.env.NODE_ENV === 'development'
+    showDebugInfo: process.env.NODE_ENV === 'development',
+    // Clear all color splashes on startup (for testing)
+    clearSplashesOnStartup: false
   },
 
   // Visual Effects

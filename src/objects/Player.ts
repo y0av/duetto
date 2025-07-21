@@ -116,6 +116,10 @@ export class Player {
     if (Phaser.Geom.Intersects.RectangleToRectangle(redOrbBounds, obstacleBounds)) {
       this.createCollisionEffect(this.redOrb.x, this.redOrb.y, 0xff4444);
       obstacle.setTint(0xff4444);
+      
+      // Add permanent color splash to obstacle
+      obstacle.addColorSplash(this.redOrb.x, this.redOrb.y, GameProperties.player.redOrbColor);
+      
       return true;
     }
 
@@ -124,6 +128,10 @@ export class Player {
     if (Phaser.Geom.Intersects.RectangleToRectangle(blueOrbBounds, obstacleBounds)) {
       this.createCollisionEffect(this.blueOrb.x, this.blueOrb.y, 0x4444ff);
       obstacle.setTint(0x4444ff);
+      
+      // Add permanent color splash to obstacle
+      obstacle.addColorSplash(this.blueOrb.x, this.blueOrb.y, GameProperties.player.blueOrbColor);
+      
       return true;
     }
 

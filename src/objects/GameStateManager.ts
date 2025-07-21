@@ -1,7 +1,21 @@
+export interface ColorSplashData {
+  x: number; // Relative position on obstacle (0-1)
+  y: number; // Relative position on obstacle (0-1)
+  color: number;
+  size: number;
+  alpha: number;
+}
+
+export interface ObstacleSplashData {
+  obstacleId: string; // Unique identifier for the obstacle
+  splashes: ColorSplashData[];
+}
+
 export interface GameState {
   completedLevels: number[];
   currentLevel: number;
   totalLevels: number;
+  colorSplashes: { [levelId: string]: ObstacleSplashData[] }; // Store splashes by level
 }
 
 export class GameStateManager {
@@ -24,7 +38,12 @@ export class GameStateManager {
     try {
       const saved = localStorage.getItem(this.storageKey);
       if (saved) {
-        return JSON.parse(saved);
+        const loadedState = JSON.parse(saved);
+        // Ensure backward compatibility - add colorSplashes if missing
+        if (!loadedState.colorSplashes) {
+          loadedState.colorSplashes = {};
+        }
+        return loadedState;
       }
     } catch (error) {
       console.warn('Failed to load game state:', error);
@@ -34,7 +53,8 @@ export class GameStateManager {
     return {
       completedLevels: [],
       currentLevel: 1,
-      totalLevels: 2
+      totalLevels: 2,
+      colorSplashes: {}
     };
   }
 
@@ -75,7 +95,8 @@ export class GameStateManager {
     this.gameState = {
       completedLevels: [],
       currentLevel: 1,
-      totalLevels: 2
+      totalLevels: 2,
+      colorSplashes: {}
     };
     this.saveGameState();
   }
@@ -85,5 +106,40 @@ export class GameStateManager {
       completed: this.gameState.completedLevels.length,
       total: this.gameState.totalLevels
     };
+  }
+
+  public saveColorSplashes(levelId: string, obstacleId: string, splashes: ColorSplashData[]): void {
+    if (!this.gameState.colorSplashes[levelId]) {
+      this.gameState.colorSplashes[levelId] = [];
+    }
+    
+    // Find existing obstacle data or create new
+    const existingIndex = this.gameState.colorSplashes[levelId].findIndex(
+      obs => obs.obstacleId === obstacleId
+    );
+    
+    if (existingIndex >= 0) {
+      // Update existing obstacle splashes
+      this.gameState.colorSplashes[levelId][existingIndex].splashes = splashes;
+    } else {
+      // Add new obstacle splash data
+      this.gameState.colorSplashes[levelId].push({
+        obstacleId,
+        splashes
+      });
+    }
+    
+    this.saveGameState();
+  }
+
+  public getColorSplashes(levelId: string): ObstacleSplashData[] {
+    return this.gameState.colorSplashes[levelId] || [];
+  }
+
+  public clearLevelSplashes(levelId: string): void {
+    if (this.gameState.colorSplashes[levelId]) {
+      delete this.gameState.colorSplashes[levelId];
+      this.saveGameState();
+    }
   }
 }

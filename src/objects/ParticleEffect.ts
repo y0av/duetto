@@ -70,7 +70,7 @@ export class ParticleEffect {
     }
   }
 
-  private createSparkles(x: number, y: number, color: number): void {
+  private createSparkles(x: number, y: number, _color: number): void {
     // Massive sparkle particles explosion
     const sparkleCount = GameProperties.visual.particles.collision.sparkles;
     for (let i = 0; i < sparkleCount; i++) {
@@ -138,7 +138,7 @@ export class ParticleEffect {
     }
   }
 
-  private createLightningEffect(x: number, y: number, color: number): void {
+  private createLightningEffect(x: number, y: number, _color: number): void {
     // Lightning-like effects radiating outward
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI * 2;

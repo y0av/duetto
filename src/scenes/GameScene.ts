@@ -78,7 +78,15 @@ export class GameScene extends Phaser.Scene {
     // Load level data
     this.levelData = this.getLevelData(this.currentLevel);
     console.log('Loading level data:', this.levelData);
-    this.obstacleManager.loadLevel(this.levelData);
+    
+    // Debug: Clear splash data if enabled
+    if (GameProperties.debug.clearSplashesOnStartup) {
+      const gameState = GameStateManager.getInstance();
+      gameState.clearLevelSplashes(`level_${this.currentLevel}`);
+      console.log(`Cleared splash data for level ${this.currentLevel}`);
+    }
+    
+    this.obstacleManager.loadLevel(this.levelData, this.currentLevel);
 
     // Set up input
     this.setupInput();

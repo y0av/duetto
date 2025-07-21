@@ -11,6 +11,7 @@ export class ObstacleManager {
   private currentObstacleIndex: number = 0;
   private gameWidth: number;
   private gameHeight: number;
+  private currentLevel: number = 1;
 
   constructor(scene: Phaser.Scene, gameWidth: number, gameHeight: number) {
     this.scene = scene;
@@ -18,8 +19,9 @@ export class ObstacleManager {
     this.gameHeight = gameHeight;
   }
 
-  public loadLevel(levelData: LevelData): void {
+  public loadLevel(levelData: LevelData, levelNumber: number = 1): void {
     this.levelData = levelData;
+    this.currentLevel = levelNumber;
     this.currentObstacleIndex = 0;
     this.spawnTimer = 0;
     this.clearAllObstacles();
@@ -57,19 +59,26 @@ export class ObstacleManager {
 
   private spawnObstacle(obstacleData: ObstacleData): void {
     const speed = this.levelData?.obstacleSpeed || 100;
+    const levelId = `level_${this.currentLevel}`;
     
     // Get responsive scaling factor
     const scale = Math.min(this.gameWidth / 1920, this.gameHeight / 1080);
     
     if (obstacleData.type === 'single') {
+      const obstacleId = `single_${this.currentObstacleIndex}_${obstacleData.x}_${obstacleData.height}`;
       const obstacle = new Obstacle(
         this.scene,
         obstacleData.x,
         -obstacleData.height / 2, // Start above screen
         obstacleData.width,
         obstacleData.height,
-        speed
+        speed,
+        obstacleId
       );
+      
+      // Load existing splash data
+      obstacle.loadSplashesFromStorage(levelId);
+      
       this.obstacles.push(obstacle);
     } else if (obstacleData.type === 'double') {
       // Create two obstacles with a gap - scale gap for higher resolution
@@ -78,26 +87,38 @@ export class ObstacleManager {
       const rightWidth = this.gameWidth - (obstacleData.x + gapSize / 2);
 
       if (leftWidth > 40 * scale) {
+        const leftId = `double_left_${this.currentObstacleIndex}_${obstacleData.x}_${obstacleData.height}`;
         const leftObstacle = new Obstacle(
           this.scene,
           leftWidth / 2,
           -obstacleData.height / 2,
           leftWidth,
           obstacleData.height,
-          speed
+          speed,
+          leftId
         );
+        
+        // Load existing splash data
+        leftObstacle.loadSplashesFromStorage(levelId);
+        
         this.obstacles.push(leftObstacle);
       }
 
       if (rightWidth > 40 * scale) {
+        const rightId = `double_right_${this.currentObstacleIndex}_${obstacleData.x}_${obstacleData.height}`;
         const rightObstacle = new Obstacle(
           this.scene,
           obstacleData.x + gapSize / 2 + rightWidth / 2,
           -obstacleData.height / 2,
           rightWidth,
           obstacleData.height,
-          speed
+          speed,
+          rightId
         );
+        
+        // Load existing splash data
+        rightObstacle.loadSplashesFromStorage(levelId);
+        
         this.obstacles.push(rightObstacle);
       }
     } else if (obstacleData.type === 'triple') {
@@ -109,38 +130,56 @@ export class ObstacleManager {
 
       // Left obstacle
       if (leftX - obstacleData.width / 2 > 0) {
+        const leftId = `triple_left_${this.currentObstacleIndex}_${obstacleData.width}_${obstacleData.height}`;
         const leftObstacle = new Obstacle(
           this.scene,
           leftX,
           -obstacleData.height / 2,
           obstacleData.width,
           obstacleData.height,
-          speed
+          speed,
+          leftId
         );
+        
+        // Load existing splash data
+        leftObstacle.loadSplashesFromStorage(levelId);
+        
         this.obstacles.push(leftObstacle);
       }
 
       // Center obstacle
+      const centerId = `triple_center_${this.currentObstacleIndex}_${obstacleData.width}_${obstacleData.height}`;
       const centerObstacle = new Obstacle(
         this.scene,
         centerX,
         -obstacleData.height / 2,
         obstacleData.width,
         obstacleData.height,
-        speed
+        speed,
+        centerId
       );
+      
+      // Load existing splash data
+      centerObstacle.loadSplashesFromStorage(levelId);
+      
       this.obstacles.push(centerObstacle);
 
       // Right obstacle
       if (rightX + obstacleData.width / 2 < this.gameWidth) {
+        const rightId = `triple_right_${this.currentObstacleIndex}_${obstacleData.width}_${obstacleData.height}`;
         const rightObstacle = new Obstacle(
           this.scene,
           rightX,
           -obstacleData.height / 2,
           obstacleData.width,
           obstacleData.height,
-          speed
+          speed,
+          rightId
         );
+        
+        // Load existing splash data
+        rightObstacle.loadSplashesFromStorage(levelId);
+        
         this.obstacles.push(rightObstacle);
       }
     }
