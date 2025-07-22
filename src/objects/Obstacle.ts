@@ -17,6 +17,8 @@ export class Obstacle {
   private colorSplashes: ColorSplash[] = [];
   private splashObjects: Phaser.GameObjects.Arc[] = [];
   private obstacleId: string; // Unique identifier
+  private maskGraphics: Phaser.GameObjects.Graphics; // For clipping splashes
+  private splashContainer: Phaser.GameObjects.Container; // Container for masked splashes
   public width: number;
   public height: number;
   public x: number;
@@ -33,6 +35,19 @@ export class Obstacle {
 
     this.shape = this.scene.add.rectangle(x, y, width, height, 0xffffff);
     this.shape.setStrokeStyle(2, 0xcccccc);
+
+    // Create container for splashes
+    this.splashContainer = this.scene.add.container(x, y);
+    this.splashContainer.setDepth(7); // Just above obstacles but below orbs
+
+    // Create mask graphics for clipping splashes to obstacle bounds
+    this.maskGraphics = this.scene.add.graphics();
+    this.maskGraphics.fillStyle(0xffffff);
+    this.maskGraphics.fillRect(x - width / 2, y - height / 2, width, height);
+    
+    // Apply mask to splash container
+    const mask = this.maskGraphics.createGeometryMask();
+    this.splashContainer.setMask(mask);
   }
 
   public update(delta: number): void {
@@ -40,23 +55,21 @@ export class Obstacle {
     this.y += this.speed * (delta / 1000);
     this.shape.setPosition(this.x, this.y);
     
+    // Update splash container and mask position
+    this.splashContainer.setPosition(this.x, this.y);
+    this.maskGraphics.clear();
+    this.maskGraphics.fillStyle(0xffffff);
+    this.maskGraphics.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+    
     // Update splash positions to move with obstacle
     this.updateSplashPositions();
   }
 
   private updateSplashPositions(): void {
-    // Update positions for all splash visual objects using stored relative positions
-    for (const splash of this.colorSplashes) {
-      for (const visualData of splash.visualObjects) {
-        if (visualData.obj && visualData.obj.active) {
-          // Calculate world position from stored relative position
-          const newWorldX = this.x - (this.width / 2) + (visualData.relativeX * this.width);
-          const newWorldY = this.y - (this.height / 2) + (visualData.relativeY * this.height);
-          
-          visualData.obj.setPosition(newWorldX, newWorldY);
-        }
-      }
-    }
+    // Since splashes are now in a container that moves with the obstacle,
+    // we only need to update their local positions if the obstacle changes size
+    // (which doesn't happen in this game), so this method can be simplified
+    // The container position is updated in the main update() method
   }
 
   public addColorSplash(hitX: number, hitY: number, color: number): void {
@@ -64,12 +77,11 @@ export class Obstacle {
     const relativeX = (hitX - (this.x - this.width / 2)) / this.width;
     const relativeY = (hitY - (this.y - this.height / 2)) / this.height;
     
-    // Clamp to obstacle bounds with some margin to ensure splashes stay inside
-    const margin = 0.1; // 10% margin from edges
-    const clampedX = Math.max(margin, Math.min(1 - margin, relativeX));
-    const clampedY = Math.max(margin, Math.min(1 - margin, relativeY));
+    // Clamp to obstacle bounds (0-1 range) but allow edge positioning
+    const clampedX = Math.max(0, Math.min(1, relativeX));
+    const clampedY = Math.max(0, Math.min(1, relativeY));
     
-    // Create irregular splash objects
+    // Create irregular splash objects at the exact collision point
     const visualObjects = this.createIrregularSplash(clampedX, clampedY, color, 4 + Math.random() * 3, 0.7 + Math.random() * 0.2);
     
     // Create splash data with visual objects
@@ -96,14 +108,14 @@ export class Obstacle {
   private createIrregularSplash(relativeX: number, relativeY: number, color: number, baseSize: number, baseAlpha: number): { obj: Phaser.GameObjects.Arc; relativeX: number; relativeY: number }[] {
     const visualObjects: { obj: Phaser.GameObjects.Arc; relativeX: number; relativeY: number }[] = [];
     
-    // Calculate world position
-    const worldX = this.x - (this.width / 2) + (relativeX * this.width);
-    const worldY = this.y - (this.height / 2) + (relativeY * this.height);
+    // Calculate world position relative to obstacle center
+    const localX = (relativeX - 0.5) * this.width;
+    const localY = (relativeY - 0.5) * this.height;
     
-    // Create main splash droplet
-    const mainSplash = this.scene.add.circle(worldX, worldY, baseSize, color);
+    // Create main splash droplet and add to container
+    const mainSplash = this.scene.add.circle(localX, localY, baseSize, color);
     mainSplash.setAlpha(baseAlpha);
-    mainSplash.setDepth(7); // Just above obstacles but below orbs
+    this.splashContainer.add(mainSplash); // Add to masked container
     visualObjects.push({
       obj: mainSplash,
       relativeX: relativeX,
@@ -111,23 +123,49 @@ export class Obstacle {
     });
     
     // Add 2-4 smaller satellite droplets around the main splash
+    // Adjust satellite positioning based on splash location to keep them on the obstacle
     const satelliteCount = 2 + Math.floor(Math.random() * 3);
     for (let i = 0; i < satelliteCount; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const distance = baseSize * 0.8 + Math.random() * baseSize * 0.4; // Distance from main splash
+      let distance = baseSize * 0.5 + Math.random() * baseSize * 0.3; // Slightly smaller distance
+      
+      // If main splash is near edge, bias satellite placement inward
+      const isNearLeftEdge = relativeX < 0.15;
+      const isNearRightEdge = relativeX > 0.85;
+      const isNearTopEdge = relativeY < 0.15;
+      const isNearBottomEdge = relativeY > 0.85;
+      
+      let adjustedAngle = angle;
+      if (isNearLeftEdge) {
+        // Bias angles toward the right (0 to π)
+        adjustedAngle = Math.random() * Math.PI - Math.PI/2;
+      } else if (isNearRightEdge) {
+        // Bias angles toward the left (π to 2π)
+        adjustedAngle = Math.random() * Math.PI + Math.PI/2;
+      }
+      
+      if (isNearTopEdge) {
+        // Bias angles downward
+        adjustedAngle = Math.random() * Math.PI;
+      } else if (isNearBottomEdge) {
+        // Bias angles upward
+        adjustedAngle = Math.random() * Math.PI + Math.PI;
+      }
+      
       const satelliteSize = baseSize * 0.3 + Math.random() * baseSize * 0.3; // 30-60% of main size
       
-      const satelliteX = worldX + Math.cos(angle) * distance;
-      const satelliteY = worldY + Math.sin(angle) * distance;
+      const satelliteLocalX = localX + Math.cos(adjustedAngle) * distance;
+      const satelliteLocalY = localY + Math.sin(adjustedAngle) * distance;
       
       // Calculate relative position for satellite
-      const satRelativeX = (satelliteX - (this.x - this.width / 2)) / this.width;
-      const satRelativeY = (satelliteY - (this.y - this.height / 2)) / this.height;
+      const satRelativeX = (satelliteLocalX / this.width) + 0.5;
+      const satRelativeY = (satelliteLocalY / this.height) + 0.5;
       
-      if (satRelativeX >= 0.05 && satRelativeX <= 0.95 && satRelativeY >= 0.05 && satRelativeY <= 0.95) {
-        const satellite = this.scene.add.circle(satelliteX, satelliteY, satelliteSize, color);
+      // Keep satellites within reasonable bounds (mask will clip them anyway)
+      if (satRelativeX >= -0.1 && satRelativeX <= 1.1 && satRelativeY >= -0.1 && satRelativeY <= 1.1) {
+        const satellite = this.scene.add.circle(satelliteLocalX, satelliteLocalY, satelliteSize, color);
         satellite.setAlpha(baseAlpha * 0.6); // Slightly more transparent than main splash
-        satellite.setDepth(7);
+        this.splashContainer.add(satellite); // Add to masked container
         visualObjects.push({
           obj: satellite,
           relativeX: satRelativeX,
@@ -215,6 +253,14 @@ export class Obstacle {
     this.splashObjects = [];
     this.colorSplashes = [];
     
+    // Destroy splash container and mask
+    if (this.splashContainer) {
+      this.splashContainer.destroy();
+    }
+    if (this.maskGraphics) {
+      this.maskGraphics.destroy();
+    }
+    
     // Destroy main shape
     this.shape.destroy();
   }
@@ -223,6 +269,12 @@ export class Obstacle {
     this.x = x;
     this.y = y;
     this.shape.setPosition(x, y);
+    
+    // Update splash container and mask position
+    this.splashContainer.setPosition(x, y);
+    this.maskGraphics.clear();
+    this.maskGraphics.fillStyle(0xffffff);
+    this.maskGraphics.fillRect(x - this.width / 2, y - this.height / 2, this.width, this.height);
     
     // Update splash positions when obstacle moves
     this.updateSplashPositions();

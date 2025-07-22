@@ -114,11 +114,14 @@ export class Player {
     // Check collision with red orb
     const redOrbBounds = this.redOrb.getBounds();
     if (Phaser.Geom.Intersects.RectangleToRectangle(redOrbBounds, obstacleBounds)) {
+      // Calculate the exact collision point on the obstacle's edge
+      const collisionPoint = this.calculateCollisionPoint(this.redOrb.x, this.redOrb.y, obstacle);
+      
       this.createCollisionEffect(this.redOrb.x, this.redOrb.y, 0xff4444);
       obstacle.setTint(0xff4444);
       
-      // Add permanent color splash to obstacle
-      obstacle.addColorSplash(this.redOrb.x, this.redOrb.y, GameProperties.player.redOrbColor);
+      // Add permanent color splash to obstacle at the exact collision point
+      obstacle.addColorSplash(collisionPoint.x, collisionPoint.y, GameProperties.player.redOrbColor);
       
       return true;
     }
@@ -126,16 +129,76 @@ export class Player {
     // Check collision with blue orb
     const blueOrbBounds = this.blueOrb.getBounds();
     if (Phaser.Geom.Intersects.RectangleToRectangle(blueOrbBounds, obstacleBounds)) {
+      // Calculate the exact collision point on the obstacle's edge
+      const collisionPoint = this.calculateCollisionPoint(this.blueOrb.x, this.blueOrb.y, obstacle);
+      
       this.createCollisionEffect(this.blueOrb.x, this.blueOrb.y, 0x4444ff);
       obstacle.setTint(0x4444ff);
       
-      // Add permanent color splash to obstacle
-      obstacle.addColorSplash(this.blueOrb.x, this.blueOrb.y, GameProperties.player.blueOrbColor);
+      // Add permanent color splash to obstacle at the exact collision point
+      obstacle.addColorSplash(collisionPoint.x, collisionPoint.y, GameProperties.player.blueOrbColor);
       
       return true;
     }
 
     return false;
+  }
+
+  private calculateCollisionPoint(orbX: number, orbY: number, obstacle: Obstacle): { x: number, y: number } {
+    // Get obstacle bounds
+    const obstacleLeft = obstacle.x - obstacle.width / 2;
+    const obstacleRight = obstacle.x + obstacle.width / 2;
+    const obstacleTop = obstacle.y - obstacle.height / 2;
+    const obstacleBottom = obstacle.y + obstacle.height / 2;
+    
+    // Get orb radius from game properties
+    const orbRadius = GameProperties.player.orbSize;
+    
+    // Find the closest point on the obstacle's rectangle to the orb center
+    let closestX = Math.max(obstacleLeft, Math.min(orbX, obstacleRight));
+    let closestY = Math.max(obstacleTop, Math.min(orbY, obstacleBottom));
+    
+    // Calculate the direction vector from orb center to closest point on rectangle
+    const dx = closestX - orbX;
+    const dy = closestY - orbY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // If distance is 0 (orb center is inside rectangle), find nearest edge
+    if (distance === 0) {
+      // Calculate distances to each edge
+      const distToLeft = orbX - obstacleLeft;
+      const distToRight = obstacleRight - orbX;
+      const distToTop = orbY - obstacleTop;
+      const distToBottom = obstacleBottom - orbY;
+      
+      // Find the minimum distance to determine which edge to project to
+      const minDist = Math.min(distToLeft, distToRight, distToTop, distToBottom);
+      
+      if (minDist === distToLeft) {
+        return { x: obstacleLeft, y: orbY };
+      } else if (minDist === distToRight) {
+        return { x: obstacleRight, y: orbY };
+      } else if (minDist === distToTop) {
+        return { x: orbX, y: obstacleTop };
+      } else {
+        return { x: orbX, y: obstacleBottom };
+      }
+    }
+    
+    // The collision point is where the line from orb center to closest rectangle point
+    // intersects the orb's circle boundary
+    const normalizedDx = dx / distance;
+    const normalizedDy = dy / distance;
+    
+    // Move from orb center towards the rectangle by the orb's radius
+    const collisionX = orbX + normalizedDx * orbRadius;
+    const collisionY = orbY + normalizedDy * orbRadius;
+    
+    // Ensure the collision point is actually on the rectangle's edge
+    const clampedCollisionX = Math.max(obstacleLeft, Math.min(collisionX, obstacleRight));
+    const clampedCollisionY = Math.max(obstacleTop, Math.min(collisionY, obstacleBottom));
+    
+    return { x: clampedCollisionX, y: clampedCollisionY };
   }
 
   private createCollisionEffect(x: number, y: number, color: number): void {
