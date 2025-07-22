@@ -14,7 +14,7 @@ export class SettingsScene extends Phaser.Scene {
 
   create(): void {
     const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
+    const centerY = this.cameras.main.height / 4;
     
     // Get responsive scaling factor
     const scale = Math.min(this.cameras.main.width / 1920, this.cameras.main.height / 1080);
@@ -49,13 +49,13 @@ export class SettingsScene extends Phaser.Scene {
     });
 
     // Clear Color Splashes Button
-    this.createClearSplashesButton(centerX, centerY - (50 * scale), scale);
+    this.createClearSplashesButton(centerX, centerY - (0 * scale), scale);
 
     // Reset Progress Button
-    this.createResetProgressButton(centerX, centerY + (20 * scale), scale);
+    this.createResetProgressButton(centerX, centerY + (130 * scale), scale);
 
     // Back Button
-    this.createBackButton(centerX, centerY + (120 * scale), scale);
+    this.createBackButton(centerX, centerY + (300 * scale), scale);
   }
 
   private createClearSplashesButton(x: number, y: number, scale: number): void {

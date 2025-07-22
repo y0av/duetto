@@ -17,7 +17,7 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
+    const centerY = this.cameras.main.height / 4;
     
     // Get responsive scaling factor
     const scale = Math.min(this.cameras.main.width / 1920, this.cameras.main.height / 1080);
@@ -80,7 +80,7 @@ export class MenuScene extends Phaser.Scene {
 
     // Developer info
     this.add.text(centerX, this.cameras.main.height - (20 * scale), 
-      'Built with Phaser 3 + TypeScript', {
+      'YoavZ', {
       fontSize: Math.max(12 * scale, 8) + 'px',
       color: '#444444',
       fontFamily: 'Exo 2, Arial, sans-serif'
@@ -112,14 +112,14 @@ export class MenuScene extends Phaser.Scene {
 
   private createTitle(centerX: number, centerY: number, scale: number): void {
     // Main title with multiple layers for depth
-    const titleShadow = this.add.text(centerX + 4, centerY - (150 * scale) + 4, 'DUET', {
+    const titleShadow = this.add.text(centerX + 4, centerY - (150 * scale) + 4, 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: '#000000',
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.titleText = this.add.text(centerX, centerY - (150 * scale), 'DUET', {
+    this.titleText = this.add.text(centerX, centerY - (150 * scale), 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: GameProperties.ui.colors.primary,
       fontFamily: GameProperties.ui.fonts.title,
@@ -128,7 +128,7 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Gradient overlay effect
-    const titleOverlay = this.add.text(centerX, centerY - (150 * scale), 'DUET', {
+    const titleOverlay = this.add.text(centerX, centerY - (150 * scale), 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: GameProperties.ui.colors.accent,
       fontFamily: GameProperties.ui.fonts.title
@@ -301,7 +301,7 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // Instructions text
-    this.add.text(centerX, instructionsY, 
+    this.add.text(centerX, instructionsY+10, 
       'Tap screen sides or use arrow keys to rotate', {
       fontSize: Math.max(14 * scale, 10) + 'px',
       color: '#888888',

@@ -21,7 +21,7 @@ export interface GameState {
 export class GameStateManager {
   private static instance: GameStateManager;
   private gameState: GameState;
-  private storageKey = 'duet-game-save';
+  private storageKey = 'duetto-game-save';
 
   private constructor() {
     this.gameState = this.loadGameState();
