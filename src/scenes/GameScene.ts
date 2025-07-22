@@ -304,7 +304,7 @@ export class GameScene extends Phaser.Scene {
           { type: 'single', x: this.gameConfig.centerX, width: 70 * scale, height: 180 * scale, delay: 28000 }
         ]
       };
-    } else {
+    } else if (level === 2) {
       return {
         id: 2,
         name: 'Intermediate',
@@ -321,6 +321,54 @@ export class GameScene extends Phaser.Scene {
           { type: 'double', x: this.gameConfig.centerX + (150 * scale), width: 90 * scale, height: 140 * scale, delay: 22500 },
           { type: 'triple', x: this.gameConfig.centerX, width: 65 * scale, height: 120 * scale, delay: 26500 },
           { type: 'single', x: this.gameConfig.centerX, width: 60 * scale, height: 200 * scale, delay: 30500 }
+        ]
+      };
+    } else if (level === 3) {
+      return {
+        id: 3,
+        name: 'Advanced - Moving Obstacles',
+        obstacleSpeed: 180,
+        duration: 60000,
+        obstacles: [
+          // Start with static obstacles to ease into the level
+          { type: 'single', x: this.gameConfig.centerX, width: 80 * scale, height: 100 * scale, delay: 2000 },
+          { type: 'double', x: this.gameConfig.centerX, width: 70 * scale, height: 120 * scale, delay: 5000 },
+          
+          // Introduce moving obstacles
+          { type: 'moving-single', x: this.gameConfig.centerX - (100 * scale), width: 90 * scale, height: 110 * scale, delay: 8500, horizontalSpeed: 80 },
+          { type: 'moving-single', x: this.gameConfig.centerX + (100 * scale), width: 90 * scale, height: 110 * scale, delay: 12000, horizontalSpeed: 100 },
+          
+          // Mix static and moving
+          { type: 'triple', x: this.gameConfig.centerX, width: 60 * scale, height: 130 * scale, delay: 16000 },
+          { type: 'moving-double', x: this.gameConfig.centerX, width: 80 * scale, height: 120 * scale, delay: 20000, horizontalSpeed: 120 },
+          
+          // More challenging patterns
+          { type: 'moving-single', x: this.gameConfig.centerX, width: 100 * scale, height: 140 * scale, delay: 24500, horizontalSpeed: 90 },
+          { type: 'single', x: this.gameConfig.centerX - (150 * scale), width: 80 * scale, height: 100 * scale, delay: 28000 },
+          { type: 'moving-single', x: this.gameConfig.centerX + (150 * scale), width: 80 * scale, height: 100 * scale, delay: 30000, horizontalSpeed: 110 },
+          
+          // Intense finale
+          { type: 'moving-double', x: this.gameConfig.centerX, width: 70 * scale, height: 150 * scale, delay: 34000, horizontalSpeed: 100 },
+          { type: 'triple', x: this.gameConfig.centerX, width: 65 * scale, height: 120 * scale, delay: 38000 },
+          { type: 'moving-single', x: this.gameConfig.centerX, width: 90 * scale, height: 180 * scale, delay: 42500, horizontalSpeed: 85 },
+          
+          // Final challenges
+          { type: 'moving-double', x: this.gameConfig.centerX + (50 * scale), width: 75 * scale, height: 130 * scale, delay: 47000, horizontalSpeed: 95 },
+          { type: 'moving-single', x: this.gameConfig.centerX - (100 * scale), width: 85 * scale, height: 160 * scale, delay: 51000, horizontalSpeed: 105 },
+          { type: 'single', x: this.gameConfig.centerX, width: 70 * scale, height: 200 * scale, delay: 55000 }
+        ]
+      };
+    } else {
+      // Default fallback (level 1 for any unhandled level)
+      return {
+        id: 1,
+        name: 'Beginner',
+        obstacleSpeed: 120,
+        duration: 30000,
+        obstacles: [
+          { type: 'single', x: this.gameConfig.centerX, width: 80 * scale, height: 120 * scale, delay: 2000 },
+          { type: 'double', x: this.gameConfig.centerX, width: 100 * scale, height: 140 * scale, delay: 6000 },
+          { type: 'single', x: this.gameConfig.centerX - (200 * scale), width: 100 * scale, height: 120 * scale, delay: 10000 }
         ]
       };
     }

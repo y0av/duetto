@@ -8,6 +8,7 @@ export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
   private level1Button!: Phaser.GameObjects.Text;
   private level2Button!: Phaser.GameObjects.Text;
+  private level3Button!: Phaser.GameObjects.Text;
   private starField!: StarField;
   private gameStateManager!: GameStateManager;
 
@@ -201,9 +202,29 @@ export class MenuScene extends Phaser.Scene {
 
     level2Container.add([level2Bg, level2Border, this.level2Button]);
 
+    // Level 3 Button
+    const level3Completed = this.gameStateManager.isLevelCompleted(3);
+    const level3Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)) + buttonSpacing * 2);
+    
+    const level3Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
+    const level3Border = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
+    level3Border.setStrokeStyle(Math.max(3 * scale, 2), level3Completed ? 0x00ff44 : 0xff8800);
+    
+    const level3Text = level3Completed ? 'LEVEL 3 ✓' : 'LEVEL 3';
+    const level3Color = level3Completed ? '#00ff44' : '#ff8800';
+    
+    this.level3Button = this.add.text(0, 0, level3Text, {
+      fontSize: Math.max(28 * scale, 18) + 'px',
+      color: level3Color,
+      fontFamily: 'Exo 2, Arial, sans-serif'
+    }).setOrigin(0.5);
+
+    level3Container.add([level3Bg, level3Border, this.level3Button]);
+
     // Make buttons interactive with hover effects
     this.setupModernButton(level1Container, level1Border, 1, scale);
     this.setupModernButton(level2Container, level2Border, 2, scale);
+    this.setupModernButton(level3Container, level3Border, 3, scale);
   }
 
   private createSettingsButton(centerX: number, centerY: number, scale: number): void {

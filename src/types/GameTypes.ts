@@ -1,9 +1,10 @@
 export interface ObstacleData {
-  type: 'single' | 'double' | 'triple';
+  type: 'single' | 'double' | 'triple' | 'moving-single' | 'moving-double';
   x: number;
   width: number;
   height: number;
   delay: number;
+  horizontalSpeed?: number; // Optional horizontal speed for moving obstacles
 }
 
 export interface LevelData {

@@ -53,7 +53,7 @@ export class GameStateManager {
     return {
       completedLevels: [],
       currentLevel: 1,
-      totalLevels: 2,
+      totalLevels: 3,
       colorSplashes: {}
     };
   }
@@ -95,7 +95,7 @@ export class GameStateManager {
     this.gameState = {
       completedLevels: [],
       currentLevel: 1,
-      totalLevels: 2,
+      totalLevels: 3,
       colorSplashes: {}
     };
     this.saveGameState();

@@ -3,7 +3,7 @@ import type { GameConfig } from '../types/GameTypes';
 import { ParticleEffect } from './ParticleEffect';
 import { Trail } from './Trail';
 import { GameProperties } from '../config/GameProperties';
-import type { Obstacle } from './Obstacle';
+import type { BaseObstacle } from './BaseObstacle';
 
 export class Player {
   private scene: Phaser.Scene;
@@ -108,7 +108,7 @@ export class Player {
     this.blueOrb.setPosition(blueX, blueY);
   }
 
-  public checkCollision(obstacle: Obstacle): boolean {
+  public checkCollision(obstacle: BaseObstacle): boolean {
     const obstacleBounds = obstacle.getBounds();
     
     // Check collision with red orb
@@ -144,7 +144,7 @@ export class Player {
     return false;
   }
 
-  private calculateCollisionPoint(orbX: number, orbY: number, obstacle: Obstacle): { x: number, y: number } {
+  private calculateCollisionPoint(orbX: number, orbY: number, obstacle: BaseObstacle): { x: number, y: number } {
     // Get obstacle bounds
     const obstacleLeft = obstacle.x - obstacle.width / 2;
     const obstacleRight = obstacle.x + obstacle.width / 2;
