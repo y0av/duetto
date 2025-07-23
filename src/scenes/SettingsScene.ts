@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 import { Scenes } from '../types/GameTypes';
-import { GameStateManager } from '../objects/GameStateManager';
-import { StarField } from '../objects/StarField';
+import { GameStateManager } from '../core/managers/GameStateManager';
+import { StarField } from '../effects/StarField';
 import { GameProperties } from '../config/GameProperties';
 
 export class SettingsScene extends Phaser.Scene {
-  private starField!: StarField;
   private gameStateManager!: GameStateManager;
-
+  private starField!: StarField;
+  
   constructor() {
     super({ key: Scenes.SETTINGS });
   }
@@ -27,7 +27,6 @@ export class SettingsScene extends Phaser.Scene {
 
     // Get game state manager
     this.gameStateManager = GameStateManager.getInstance();
-
     // Settings title
     const title = this.add.text(centerX, centerY - (150 * scale), 'SETTINGS', {
       fontSize: Math.max(48 * scale, 32) + 'px',

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Scenes } from '../types/GameTypes';
-import { GameStateManager } from '../objects/GameStateManager';
-import { StarField } from '../objects/StarField';
+import { GameStateManager } from '../core/managers/GameStateManager';
+import { StarField } from '../effects/StarField';
 import { GameProperties } from '../config/GameProperties';
 
 export class MenuScene extends Phaser.Scene {

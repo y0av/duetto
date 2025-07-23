@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Scenes } from '../types/GameTypes';
-import { StarField } from '../objects/StarField';
+import { StarField } from '../effects/StarField';
 
 export class GameOverScene extends Phaser.Scene {
   private currentLevel: number = 1;

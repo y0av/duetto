@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameStateManager, type ColorSplashData } from './GameStateManager';
+import { GameStateManager, type ColorSplashData } from '../managers/GameStateManager';
 
 export interface ColorSplash {
   x: number; // Relative position on obstacle (0-1)

@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import type { GameConfig } from '../types/GameTypes';
-import { ParticleEffect } from './ParticleEffect';
-import { Trail } from './Trail';
+import { ParticleEffect } from '../effects/ParticleEffect';
+import { Trail } from '../effects/Trail';
 import { GameProperties } from '../config/GameProperties';
-import type { BaseObstacle } from './BaseObstacle';
+import type { BaseObstacle } from '../core/obstacles/BaseObstacle';
 
 export class Player {
   private scene: Phaser.Scene;

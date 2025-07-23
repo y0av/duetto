@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { Obstacle } from './Obstacle';
-import { MovingObstacle } from './MovingObstacle';
-import { BaseObstacle } from './BaseObstacle';
-import { Player } from './Player';
-import type { LevelData, ObstacleData } from '../types/GameTypes';
+import { Obstacle } from '../obstacles/Obstacle';
+import { MovingObstacle } from '../obstacles/MovingObstacle';
+import { BaseObstacle } from '../obstacles/BaseObstacle';
+import { Player } from '../../objects/Player';
+import type { LevelData, ObstacleData } from '../../types/GameTypes';
 
 export class ObstacleManager {
   private scene: Phaser.Scene;
@@ -195,52 +195,6 @@ export class ObstacleManager {
           obstacleData.width,
           obstacleData.height,
           speed,
-          rightId
-        );
-        
-        // Load existing splash data
-        rightObstacle.loadSplashesFromStorage(levelId);
-        
-        this.obstacles.push(rightObstacle);
-      }
-    } else if (obstacleData.type === 'moving-double') {
-      // Create two moving obstacles with a gap
-      const gapSize = Math.max(250 * scale, 180); // Increased gap for larger orb radius
-      const leftWidth = obstacleData.x - gapSize / 2;
-      const rightWidth = this.gameWidth - (obstacleData.x + gapSize / 2);
-      const horizontalSpeed = obstacleData.horizontalSpeed || 100;
-
-      if (leftWidth > 40 * scale) {
-        const leftId = `moving_double_left_${this.currentObstacleIndex}_${obstacleData.x}_${obstacleData.height}`;
-        const leftObstacle = new MovingObstacle(
-          this.scene,
-          leftWidth / 2,
-          -obstacleData.height / 2,
-          leftWidth,
-          obstacleData.height,
-          speed,
-          this.gameWidth,
-          horizontalSpeed,
-          leftId
-        );
-        
-        // Load existing splash data
-        leftObstacle.loadSplashesFromStorage(levelId);
-        
-        this.obstacles.push(leftObstacle);
-      }
-
-      if (rightWidth > 40 * scale) {
-        const rightId = `moving_double_right_${this.currentObstacleIndex}_${obstacleData.x}_${obstacleData.height}`;
-        const rightObstacle = new MovingObstacle(
-          this.scene,
-          obstacleData.x + gapSize / 2 + rightWidth / 2,
-          -obstacleData.height / 2,
-          rightWidth,
-          obstacleData.height,
-          speed,
-          this.gameWidth,
-          horizontalSpeed,
           rightId
         );
         
