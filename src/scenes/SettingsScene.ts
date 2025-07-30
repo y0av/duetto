@@ -48,13 +48,13 @@ export class SettingsScene extends Phaser.Scene {
     });
 
     // Clear Color Splashes Button
-    this.createClearSplashesButton(centerX, centerY - (0 * scale), scale);
+    this.createClearSplashesButton(centerX, centerY + (20 * scale), scale);
 
     // Reset Progress Button
-    this.createResetProgressButton(centerX, centerY + (130 * scale), scale);
+    this.createResetProgressButton(centerX, centerY + (290 * scale), scale);
 
     // Back Button
-    this.createBackButton(centerX, centerY + (300 * scale), scale);
+    this.createBackButton(centerX, centerY + (560 * scale), scale);
   }
 
   private createClearSplashesButton(x: number, y: number, scale: number): void {

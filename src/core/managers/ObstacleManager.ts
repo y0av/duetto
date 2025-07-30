@@ -204,7 +204,7 @@ export class ObstacleManager {
         this.obstacles.push(rightObstacle);
       }
     } else if (obstacleData.type === 'moving-double') {
-      // Create two moving obstacles with a gap
+      // Create two moving obstacles with a gap - using specified width like regular double
       const gapSize = Math.max(250 * scale, 180); // Increased gap for larger orb radius
       const leftWidth = obstacleData.x - gapSize / 2;
       const rightWidth = this.gameWidth - (obstacleData.x + gapSize / 2);
@@ -216,7 +216,7 @@ export class ObstacleManager {
           this.scene,
           leftWidth / 2,
           -obstacleData.height / 2,
-          leftWidth,
+          obstacleData.width, // Use the specified width instead of calculated leftWidth
           obstacleData.height,
           speed,
           this.gameWidth,
@@ -236,7 +236,7 @@ export class ObstacleManager {
           this.scene,
           obstacleData.x + gapSize / 2 + rightWidth / 2,
           -obstacleData.height / 2,
-          rightWidth,
+          obstacleData.width, // Use the specified width instead of calculated rightWidth
           obstacleData.height,
           speed,
           this.gameWidth,

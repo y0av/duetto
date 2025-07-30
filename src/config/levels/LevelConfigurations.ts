@@ -64,7 +64,7 @@ export class LevelConfigurations {
             
             // Gradually increase difficulty
             { type: 'triple', x: gameConfig.centerX, width: 55 * scale, height: 120 * scale, delay: 22000 },
-            //{ type: 'moving-double', x: gameConfig.centerX, width: 1 * scale, height: 100 * scale, delay: 26000, horizontalSpeed: 80 },
+            { type: 'moving-double', x: gameConfig.centerX, width: 100 * scale, height: 100 * scale, delay: 26000, horizontalSpeed: 80 },
             
             // More challenging patterns
             { type: 'moving-single', x: gameConfig.centerX, width: 20 * scale, height: 110 * scale, delay: 30000, horizontalSpeed: 75 },
@@ -72,7 +72,7 @@ export class LevelConfigurations {
             { type: 'moving-single', x: gameConfig.centerX + (140 * scale), width: 70 * scale, height: 90 * scale, delay: 36000, horizontalSpeed: 85 },
             
             // Final challenges - still reasonable
-            //{ type: 'moving-double', x: gameConfig.centerX, width: 15 * scale, height: 120 * scale, delay: 40000, horizontalSpeed: 70 },
+            { type: 'moving-double', x: gameConfig.centerX, width: 135 * scale, height: 120 * scale, delay: 40000, horizontalSpeed: 70 },
             { type: 'triple', x: gameConfig.centerX, width: 60 * scale, height: 110 * scale, delay: 44000 },
             { type: 'moving-single', x: gameConfig.centerX, width: 75 * scale, height: 140 * scale, delay: 47500, horizontalSpeed: 65 }
           ]

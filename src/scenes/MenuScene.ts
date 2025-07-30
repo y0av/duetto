@@ -18,7 +18,6 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 4;
     
     // Get responsive scaling factor
     const scale = Math.min(this.cameras.main.width / 1920, this.cameras.main.height / 1080);
@@ -29,8 +28,28 @@ export class MenuScene extends Phaser.Scene {
     // Create starfield background
     this.starField = new StarField(this);
 
+    // Get game state manager
+    this.gameStateManager = GameStateManager.getInstance();
+
+    // Calculate dynamic layout based on screen height and number of levels
+    const titleY = Math.max(80 * scale, 60);
+    const subtitleY = titleY + Math.max(50 * scale, 60);
+    const levelButtonsStartY = subtitleY + Math.max(80 * scale, 60);
+    const totalLevels = 3; // This can be made dynamic later
+    const buttonSpacing = Math.max(80 * scale, 60);
+    const levelButtonsEndY = levelButtonsStartY + (totalLevels - 1) * buttonSpacing + Math.max(60 * scale, 45);
+    
+    // Progress section positioned after level buttons with spacing
+    const progressY = levelButtonsEndY + Math.max(80 * scale, 60);
+    
+    // Settings button positioned after progress with increased spacing to account for progress text
+    const settingsY = progressY + Math.max(100 * scale, 85); // Increased spacing for progress bar + text + padding
+    
+    // Instructions at bottom with some padding
+    const instructionsY = this.cameras.main.height - Math.max(100 * scale, 80);
+
     // Add subtle background glow effect
-    const bgGlow = this.add.circle(centerX, centerY - (100 * scale), 400 * scale, 0x1a1a3a, 0.1);
+    const bgGlow = this.add.circle(centerX, titleY + Math.max(100 * scale, 80), 400 * scale, 0x1a1a3a, 0.1);
     this.tweens.add({
       targets: bgGlow,
       alpha: 0.2,
@@ -41,17 +60,14 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // Get game state manager
-    this.gameStateManager = GameStateManager.getInstance();
-
     // Create floating geometric shapes for decoration
     this.createFloatingShapes(scale);
 
     // Main title with multiple effects
-    this.createTitle(centerX, centerY, scale);
+    this.createTitle(centerX, titleY, scale);
 
     // Subtitle with better mobile spacing
-    const subtitle = this.add.text(centerX, centerY - (Math.max(80 * scale, 60)), 'A Minimalist Challenge', {
+    const subtitle = this.add.text(centerX, subtitleY, 'A Minimalist Challenge', {
       fontSize: Math.max(20 * scale, 14) + 'px',
       color: '#888888',
       fontFamily: 'Exo 2, Arial, sans-serif',
@@ -67,17 +83,17 @@ export class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // Level buttons with modern design and mobile spacing
-    this.createLevelButtons(centerX, centerY, scale);
+    // Level buttons with dynamic positioning
+    this.createLevelButtons(centerX, levelButtonsStartY, scale, buttonSpacing);
 
     // Progress section with visual flair
-    this.createProgressSection(centerX, centerY, scale);
+    this.createProgressSection(centerX, progressY, scale);
 
     // Settings Button - positioned below progress section
-    this.createSettingsButton(centerX, centerY + Math.max(300 * scale, 250), scale);
+    this.createSettingsButton(centerX, settingsY, scale);
 
-    // Instructions with animated icons
-    this.createInstructions(centerX, scale);
+    // Instructions with animated icons - positioned at bottom
+    this.createInstructions(centerX, instructionsY, scale);
 
     // Developer info
     this.add.text(centerX, this.cameras.main.height - (20 * scale), 
@@ -113,14 +129,14 @@ export class MenuScene extends Phaser.Scene {
 
   private createTitle(centerX: number, centerY: number, scale: number): void {
     // Main title with multiple layers for depth
-    const titleShadow = this.add.text(centerX + 4, centerY - (150 * scale) + 4, 'DUETTO', {
+    const titleShadow = this.add.text(centerX + 4, centerY - (-10 * scale) + 4, 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: '#000000',
       fontFamily: 'Arial, sans-serif',
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
-    this.titleText = this.add.text(centerX, centerY - (150 * scale), 'DUETTO', {
+    this.titleText = this.add.text(centerX, centerY - (-10 * scale), 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: GameProperties.ui.colors.primary,
       fontFamily: GameProperties.ui.fonts.title,
@@ -129,7 +145,7 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Gradient overlay effect
-    const titleOverlay = this.add.text(centerX, centerY - (150 * scale), 'DUETTO', {
+    const titleOverlay = this.add.text(centerX, centerY - (-10 * scale), 'DUETTO', {
       fontSize: Math.max(84 * scale, 42) + 'px',
       color: GameProperties.ui.colors.accent,
       fontFamily: GameProperties.ui.fonts.title
@@ -158,14 +174,13 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
-  private createLevelButtons(centerX: number, centerY: number, scale: number): void {
+  private createLevelButtons(centerX: number, startY: number, scale: number, spacing: number): void {
     const buttonWidth = Math.max(280 * scale, 200);
     const buttonHeight = Math.max(60 * scale, 45);
-    const buttonSpacing = Math.max(90 * scale, 70); // Increased spacing for mobile
 
     // Level 1 Button
     const level1Completed = this.gameStateManager.isLevelCompleted(1);
-    const level1Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)));
+    const level1Container = this.add.container(centerX, startY);
     
     // Button background with gradient effect
     const level1Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
@@ -183,9 +198,9 @@ export class MenuScene extends Phaser.Scene {
 
     level1Container.add([level1Bg, level1Border, this.level1Button]);
     
-    // Level 2 Button with better spacing
+    // Level 2 Button
     const level2Completed = this.gameStateManager.isLevelCompleted(2);
-    const level2Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)) + buttonSpacing);
+    const level2Container = this.add.container(centerX, startY + spacing);
     
     const level2Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
     const level2Border = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
@@ -204,7 +219,7 @@ export class MenuScene extends Phaser.Scene {
 
     // Level 3 Button
     const level3Completed = this.gameStateManager.isLevelCompleted(3);
-    const level3Container = this.add.container(centerX, centerY + (Math.max(30 * scale, 20)) + buttonSpacing * 2);
+    const level3Container = this.add.container(centerX, startY + spacing * 2);
     
     const level3Bg = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0x333333);
     const level3Border = this.add.rectangle(0, 0, buttonWidth, buttonHeight);
@@ -253,20 +268,19 @@ export class MenuScene extends Phaser.Scene {
   private createProgressSection(centerX: number, centerY: number, scale: number): void {
     const progress = this.gameStateManager.getProgress();
     
-    // Progress container with better mobile spacing
-    const progressY = centerY + Math.max(220 * scale, 180);
+    // Use the passed centerY parameter directly for proper positioning
     const progressBarWidth = Math.max(200 * scale, 150);
     const progressBarHeight = Math.max(8 * scale, 6);
     
-    // Progress bar background
-    this.add.rectangle(centerX, progressY, progressBarWidth, progressBarHeight, 0x333333);
+    // Progress bar background - centered
+    this.add.rectangle(centerX, centerY, progressBarWidth, progressBarHeight, 0x333333);
     
     // Progress bar fill - properly aligned
     if (progress.completed > 0) {
       const fillWidth = (progress.completed / progress.total) * progressBarWidth;
       const progressFill = this.add.rectangle(
         centerX - (progressBarWidth / 2) + (fillWidth / 2), // Properly positioned from left edge
-        progressY,
+        centerY,
         fillWidth,
         progressBarHeight,
         0x00ff44
@@ -283,8 +297,8 @@ export class MenuScene extends Phaser.Scene {
       });
     }
 
-    // Progress text with better mobile spacing
-    this.add.text(centerX, progressY + Math.max(30 * scale, 25), 
+    // Progress text - positioned below progress bar with proper spacing
+    this.add.text(centerX, centerY + Math.max(30 * scale, 25), 
       `${progress.completed}/${progress.total} LEVELS COMPLETED`, {
       fontSize: Math.max(16 * scale, 12) + 'px',
       color: '#aaaaaa',
@@ -292,9 +306,7 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
   }
 
-  private createInstructions(centerX: number, scale: number): void {
-    const instructionsY = this.cameras.main.height - (80 * scale);
-    
+  private createInstructions(centerX: number, instructionsY: number, scale: number): void {
     // Control icons
     const leftIcon = this.add.circle(centerX - (60 * scale), instructionsY - (20 * scale), 15 * scale, 0xff4444, 0.7);
     const rightIcon = this.add.circle(centerX + (60 * scale), instructionsY - (20 * scale), 15 * scale, 0x4444ff, 0.7);
