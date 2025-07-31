@@ -159,7 +159,7 @@ export class ParticleEffect {
     }
   }
 
-  private createShockwave(x: number, y: number, color: number): void {
+/*   private createShockwave(x: number, y: number, color: number): void {
     // Expanding ring effect (kept for backward compatibility)
     const ring = this.scene.add.circle(x, y, 5, color, 0);
     ring.setStrokeStyle(3, color, 0.8);
@@ -172,7 +172,7 @@ export class ParticleEffect {
       ease: 'Power2',
       onComplete: () => ring.destroy()
     });
-  }
+  } */
 
   private createGlow(x: number, y: number, color: number): void {
     // Massive glowing orb that fades out
